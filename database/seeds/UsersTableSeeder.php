@@ -26,7 +26,9 @@ class UsersTableSeeder extends Seeder
         $admin = User::firstOrCreate([
             'name' => 'Admin',
             'email' => 'admin@admin.local',
-            'password' => bcrypt('admin')
+            'password' => bcrypt('admin'),
+            'business_name' => 'Administrator',
+            'telephone' => 123456789
         ]);
 
         $admin->assignRole('admin');
