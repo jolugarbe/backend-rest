@@ -32,7 +32,7 @@ class CreateWasteTable extends Migration
             $table->integer('t_waste_id')->unsigned()->nullable();
             $table->integer('t_ad_id')->unsigned()->nullable();
             $table->integer('creator_user_id')->unsigned()->nullable();
-            $table->integer('owner_user_id')->unsigned()->nullable();
+            $table->integer('owner_user_id')->unsigned()->nullable()->default(null);
             $table->boolean('available')->default(1);
             $table->timestamps();
 
