@@ -36,6 +36,10 @@ class Address extends Model
         return $this->belongsTo('App\Locality', 'locality_id', 'id');
     }
 
+    public function setLocalityId($value){
+        $this->locality_id = $value;
+    }
+
     public function getNotificationData(){
         return $this->belongsTo('App\NotificationData', 'address_id', 'id');
     }

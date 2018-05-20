@@ -46,11 +46,11 @@ class User extends Authenticatable
     }
 
     public function getBusinessName(){
-        return $this->businessName;
+        return $this->business_name;
     }
 
     public function setBusinessName($value){
-        $this->businessName = $value;
+        $this->business_name = $value;
     }
 
     public function getCif(){
@@ -105,6 +105,10 @@ class User extends Authenticatable
         return $this->hasOne('App\Address', 'address_id', 'id');
     }
 
+    public function setAddressId($value){
+        $this->address_id = $value;
+    }
+
     public function getActivity(){
         return $this->belongsTo('App\Activity', 'activity_id', 'id');
     }
@@ -127,5 +131,9 @@ class User extends Authenticatable
 
     public function getRequests(){
         return $this->hasMany('App\Transfer', 'applicant_user_id', 'id');
+    }
+
+    public function setPassword($value){
+        $this->password = bcrypt($value);
     }
 }

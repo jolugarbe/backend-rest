@@ -8129,7 +8129,6 @@ class LocalitiesTableSeeder extends Seeder
             ['id'=>8114,	'province_id'=>	 48,  'name'=> 'Zierbena'],
             ['id'=>8115,	'province_id'=>	 48,  'name'=> 'Arratzu'],
             ['id'=>8116,	'province_id'=>	 48,  'name'=> 'Ziortza-Bolibar'],
-            ['id'=>8117,	'province_id'=>	 53,  'name'=> 'Desconocida']
 
 
         ]);

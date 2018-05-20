@@ -14,6 +14,12 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+// Activities
+Route::get('activities/all', 'Api\ActivityController@all');
+Route::get('provinces/all', 'Api\ProvinceController@all');
+Route::get('localities/all', 'Api\LocalityController@all');
+
 Route::post('register', 'Api\AuthController@register');
 Route::post('login', 'Api\AuthController@login');
 

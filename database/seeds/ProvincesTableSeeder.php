@@ -66,7 +66,7 @@ class ProvincesTableSeeder extends Seeder
             ['id'=>50, 'country_id'=>48 ,   'name'=> 'Zaragoza'							,'created_at' => new DateTime, 'updated_at' => new DateTime ],
             ['id'=>51, 'country_id'=>48 ,   'name'=>  'Ceuta'							,'created_at' => new DateTime, 'updated_at' => new DateTime ],
             ['id'=>52, 'country_id'=>48 ,   'name'=>  'Melilla'					        ,'created_at' => new DateTime, 'updated_at' => new DateTime ],
-            ['id'=>53, 'country_id'=>48 ,   'name'=>  'Desconocida'					        ,'created_at' => new DateTime, 'updated_at' => new DateTime ]
+
         ]);
 
         $this->command->info('provinces seeded :-)');
