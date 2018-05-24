@@ -82,30 +82,18 @@ class AuthController extends Controller
         $not_telephone = array_key_exists('not_telephone', $input) ? $input['not_telephone'] : null;
         $not_email = array_key_exists('not_email', $input) ? $input['not_email'] : null;
 
+        // PASSWORD SE TENDRÁ QUE GENERAR ALEATORIO Y ENVIAR AL USUARIO POR MAIL
         //        $input['password'] = bcrypt($request->get('password'));
 
         DB::beginTransaction();
         try{
             $user = $this->userRepo->registerUser($name, $activity, $business_name, $cif, $address_line, $postal_code, $province, $locality, $contact_person, $telephone, $email, $not_address_line, $not_contact_person, $not_email, $not_locality, $not_postal_code, $not_province, $not_telephone, $carbon_footprint, $carbon_inscription, $notification_data, $password);
-//        $user = User::create($input);
-//        $user->assignRole('user');
+
             $token =  $user->createToken('MyApp')->accessToken;
 
             DB::commit();
 
-            return response()->json([
-                'token' => $token,
-                'user' => $user
-            ], 200);
-
-        }catch (\Exception $exception){
-            DB::rollBack();
-            Log::error($exception);
-            return response()->json(['exception' => $exception], 500);
-        }
-
-
-//        $contenido=\View::make('mails.confirmation', compact('email', 'token'))->render();
+            //        $contenido=\View::make('mails.confirmation', compact('email', 'token'))->render();
 //
 //        $datos=[$data['email'],
 //            $data['email'],
@@ -119,6 +107,16 @@ class AuthController extends Controller
 //        $mail=new EnviarMail($datos);
 //        $this->dispatch($mail);
 
+            return response()->json([
+                'token' => $token,
+                'user' => $user
+            ], 200);
+
+        }catch (\Exception $exception){
+            DB::rollBack();
+            Log::error($exception);
+            return response()->json(['exception' => $exception], 500);
+        }
 
     }
 
@@ -135,10 +133,16 @@ class AuthController extends Controller
             $token =  $user->createToken('MyApp')->accessToken;
             return response()->json([
                 'token' => $token,
-                'user' => $user
+                'user' => $user,
             ], 200);
         } else {
-            return response()->json(['error' => 'Unauthorised'], 401);
+            return response()->json(['error' => 'Las credenciales introducidas no están autorizadas o son incorrectas.'], 401);
         }
+    }
+
+    public function logout(Request $request){
+        $user = Auth::user();
+        Auth::user()->token()->revoke();
+        return response()->json([$user], 200);
     }
 }

@@ -17,4 +17,9 @@ class FrequencyRepo extends BaseRepo
     {
         return new FrequencyType();
     }
+
+    public function allOrderByName($way){
+        $frequencies = $this->getModel()->orderBy('name', $way)->get();
+        return $frequencies;
+    }
 }

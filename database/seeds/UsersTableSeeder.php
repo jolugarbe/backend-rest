@@ -33,5 +33,15 @@ class UsersTableSeeder extends Seeder
 
         $admin->assignRole('admin');
 
+        $user = User::firstOrCreate([
+            'name' => 'User 1',
+            'email' => 'user@front.local',
+            'password' => bcrypt('1'),
+            'business_name' => 'Test user',
+            'telephone' => 123456789
+        ]);
+
+        $user->assignRole('user');
+
     }
 }

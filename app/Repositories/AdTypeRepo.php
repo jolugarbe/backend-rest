@@ -17,4 +17,9 @@ class AdTypeRepo extends BaseRepo
     {
         return new AdType();
     }
+
+    public function allOrderByName($way){
+        $ads = $this->getModel()->orderBy('name', $way)->get();
+        return $ads;
+    }
 }

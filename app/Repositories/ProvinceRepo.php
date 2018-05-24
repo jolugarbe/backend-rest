@@ -17,4 +17,9 @@ class ProvinceRepo extends BaseRepo
     {
         return new Province();
     }
+
+    public function allOrderByName($way){
+        $provinces = $this->getModel()->orderBy('name', $way)->get();
+        return $provinces;
+    }
 }

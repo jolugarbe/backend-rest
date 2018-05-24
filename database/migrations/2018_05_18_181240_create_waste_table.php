@@ -15,10 +15,12 @@ class CreateWasteTable extends Migration
     {
         Schema::create('waste', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('name');
+            $table->text('description')->nullable();
             $table->float('quantity', 10, 2);
             $table->string('measured_unit');
             $table->string('composition');
-            $table->string('presentation');
+            $table->string('presentation')->nullable();
             $table->date('generation_date');
             $table->date('pickup_date');
             $table->string('packaging');
@@ -26,7 +28,7 @@ class CreateWasteTable extends Migration
             $table->integer('address_id')->unsigned()->nullable();
             $table->string('transport');
             $table->boolean('dangerous');
-            $table->string('production');
+            $table->string('production')->nullable();
             $table->integer('cer_code');
             $table->integer('t_frequency_id')->unsigned()->nullable();
             $table->integer('t_waste_id')->unsigned()->nullable();

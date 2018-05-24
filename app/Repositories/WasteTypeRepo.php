@@ -17,4 +17,9 @@ class WasteTypeRepo extends BaseRepo
     {
         return new WasteType();
     }
+
+    public function allOrderByName($way){
+        $types = $this->getModel()->orderBy('name', $way)->get();
+        return $types;
+    }
 }

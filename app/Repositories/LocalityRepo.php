@@ -17,4 +17,9 @@ class LocalityRepo extends BaseRepo
     {
         return new Locality();
     }
+
+    public function allOrderByName($way){
+        $localities = $this->getModel()->orderBy('name', $way)->get();
+        return $localities;
+    }
 }

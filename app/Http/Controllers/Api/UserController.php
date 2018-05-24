@@ -15,6 +15,9 @@ class UserController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        return response()->json(compact('user'), 200);
+        $total_waste = $user->getRequestedWaste->count();
+        $total_transfers = $user->getTransfers->count();
+        $total_requests = $user->getRequests->count();
+        return response()->json(['user' => $user, 'total_waste' => $total_waste, 'total_transfers' => $total_transfers, 'total_requests' => $total_requests], 200);
     }
 }

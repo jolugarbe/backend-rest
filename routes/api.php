@@ -19,10 +19,19 @@ use Illuminate\Http\Request;
 Route::get('activities/all', 'Api\ActivityController@all');
 Route::get('provinces/all', 'Api\ProvinceController@all');
 Route::get('localities/all', 'Api\LocalityController@all');
+Route::get('waste/create-data', 'Api\WasteController@allCreateData');
 
 Route::post('register', 'Api\AuthController@register');
 Route::post('login', 'Api\AuthController@login');
 
+// Auth routes
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::post('user/profile', 'Api\UserController@profile');
+    Route::prefix('user')->group(function (){
+        Route::post('logout', 'Api\AuthController@logout');
+        Route::post('profile', 'Api\UserController@profile');
+    });
+
+    Route::prefix('waste')->group(function () {
+        Route::post('register', 'Api\WasteController@register');
+    });
 });
