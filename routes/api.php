@@ -33,5 +33,12 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::prefix('waste')->group(function () {
         Route::post('register', 'Api\WasteController@register');
+        Route::post('update', 'Api\WasteController@update');
+        Route::post('update-data', 'Api\WasteController@updateData');
+        Route::post('data-by-id', 'Api\WasteController@dataById');
+        Route::post('user/offers-data', 'Api\WasteController@userOffersData');
+        Route::post('user/transfers-data', 'Api\WasteController@userTransfersData');
+        Route::post('user/requests-data', 'Api\WasteController@userRequestsData');
+        Route::post('list/available-data', 'Api\WasteController@availableListData');
     });
 });
