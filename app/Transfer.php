@@ -28,11 +28,23 @@ class Transfer extends Model
         return $this->belongsTo('App\User', 'owner_user_id', 'id');
     }
 
+    public function setOwnerWasteId($value){
+        $this->owner_user_id = $value;
+    }
+
     public function getApplicantUser(){
         return $this->belongsTo('App\User', 'applicant_user_id', 'id');
     }
 
+    public function setApplicantUserId($value){
+        $this->applicant_user_id = $value;
+    }
+
     public function getWaste(){
         return $this->belongsTo('App\Waste', 'waste_id', 'id');
+    }
+
+    public function setWasteId($value){
+        $this->waste_id = $value;
     }
 }

@@ -9,6 +9,7 @@ use App\Repositories\AdTypeRepo;
 use App\Repositories\FrequencyRepo;
 use App\Repositories\LocalityRepo;
 use App\Repositories\ProvinceRepo;
+use App\Repositories\TransferRepo;
 use App\Repositories\WasteRepo;
 use App\Repositories\WasteTypeRepo;
 use App\Waste;
@@ -29,8 +30,9 @@ class WasteController extends Controller
     protected $provinceRepo;
     protected $wasteRepo;
     protected $addressRepo;
+    protected $transferRepo;
 
-    function __construct(AdTypeRepo $adTypeRepo, FrequencyRepo $frequencyRepo, WasteTypeRepo $wasteTypeRepo, LocalityRepo $localityRepo, ProvinceRepo $provinceRepo, WasteRepo $wasteRepo, AddressRepo $addressRepo)
+    function __construct(AdTypeRepo $adTypeRepo, FrequencyRepo $frequencyRepo, WasteTypeRepo $wasteTypeRepo, LocalityRepo $localityRepo, ProvinceRepo $provinceRepo, WasteRepo $wasteRepo, AddressRepo $addressRepo, TransferRepo $transferRepo)
     {
         $this->adRepo = $adTypeRepo;
         $this->frequencyRepo = $frequencyRepo;
@@ -39,6 +41,7 @@ class WasteController extends Controller
         $this->provinceRepo = $provinceRepo;
         $this->wasteRepo = $wasteRepo;
         $this->addressRepo = $addressRepo;
+        $this->transferRepo = $transferRepo;
     }
 
     public function allCreateData(){
@@ -264,7 +267,7 @@ class WasteController extends Controller
             ->addColumn('action', function (Waste $waste) {
                 $url_demand = "http://frontend.local/waste/demand/".$waste->id;
                 $links = '';
-                $links .= '<a href="'.$url_demand.'" class="btn btn-success" ></i>Solicitar</a>';
+                $links .= '<a class="btn btn-success request-waste" data-waste_id="'.$waste->id.'" ></i>Solicitar</a>';
 
                 return $links;
             })
@@ -302,5 +305,53 @@ class WasteController extends Controller
             })
             ->rawColumns(['action'])
             ->toJson();
+    }
+
+    public function requestWaste(Request $request){
+        $input = $request->all();
+        DB::beginTransaction();
+        try{
+            $user = Auth::user();
+            $waste = $this->wasteRepo->findOrFail($input['waste_id']);
+            $owner = $waste->getCreator;
+            $transfer = $this->transferRepo->transferWaste($owner->getId(), $user->getId(), $waste->getId());
+            $waste->setOwnerId($user->getId());
+            $waste->save();
+
+            DB::commit();
+            return response()->json([
+                'message' => "Solicitud tramitada correctamente."
+            ], 200);
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return response()->json(['exception' => $exception, 'message' => "Se ha producido un error al tramitar la solicitud."], 500);
+        }
+    }
+
+    public function show(Request $request)
+    {
+        try{
+            $user = Auth::user();
+            $input = $request->all();
+            $waste = $this->wasteRepo->findOrFail($input['waste_id']);
+            $adType = $waste->getAdType->getName();
+            $frequency = $waste->getFrequency->getName();
+            $type = $waste->getWasteType->getName();
+//            $localities = $this->localityRepo->allOrderByName('asc');
+//            $provinces = $this->provinceRepo->allOrderByName('asc');
+            $address = $this->addressRepo->findOrFail($waste['address_id']);
+            $locality = $address->getLocality->getName();
+            $province = $address->getLocality->getProvince->getName();
+
+            if($waste['owner_user_id'] == $user->getId())
+            {
+                return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province], 200);
+            }else {
+                return response()->json(['exception' => 'No tienes permiso para ver este residuo.'], 403);
+            }
+
+        }catch (\Exception $exception){
+            return response()->json(['exception' => $exception->getMessage()], 500);
+        }
     }
 }

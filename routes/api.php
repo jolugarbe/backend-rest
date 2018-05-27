@@ -40,5 +40,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('user/transfers-data', 'Api\WasteController@userTransfersData');
         Route::post('user/requests-data', 'Api\WasteController@userRequestsData');
         Route::post('list/available-data', 'Api\WasteController@availableListData');
+        Route::post('request-waste', 'Api\WasteController@requestWaste');
+        Route::post('show', 'Api\WasteController@show');
     });
 });

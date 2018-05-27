@@ -122,7 +122,7 @@ class WasteRepo extends BaseRepo
             ->join('users', 'users.id', '=', 'transfers.applicant_user_id')
             ->where('waste.creator_user_id', '=', $user->getId())
             ->where('t_ad_id', '=', 1)
-            ->select('waste.name', 'waste.composition', 'waste.quantity');
+            ->select('waste.id', 'waste.name', 'waste.composition', 'waste.quantity');
 
         return $query;
     }
@@ -134,7 +134,7 @@ class WasteRepo extends BaseRepo
             ->join('users', 'users.id', '=', 'transfers.owner_user_id')
             ->where('waste.owner_user_id', '=', $user->getId())
             ->where('t_ad_id', '=', 1)
-            ->select('waste.name', 'waste.composition', 'waste.quantity');
+            ->select('waste.id', 'waste.name', 'waste.composition', 'waste.quantity');
 
         return $query;
     }
