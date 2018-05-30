@@ -39,7 +39,7 @@ class NotificationData extends Model
     }
 
     public function getAddress(){
-        return $this->hasOne('App\Address', 'address_id', 'id');
+        return $this->belongsTo('App\Address', 'address_id', 'id');
     }
 
     public function setAddressId($value){

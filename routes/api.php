@@ -28,7 +28,10 @@ Route::post('login', 'Api\AuthController@login');
 Route::group(['middleware' => 'auth:api'], function () {
     Route::prefix('user')->group(function (){
         Route::post('logout', 'Api\AuthController@logout');
-        Route::post('profile', 'Api\UserController@profile');
+        Route::post('profile-home', 'Api\UserController@profileHome');
+        Route::post('profile-data', 'Api\UserController@profileData');
+        Route::post('show', 'Api\UserController@show');
+        Route::post('update', 'Api\UserController@update');
     });
 
     Route::prefix('waste')->group(function () {
@@ -42,5 +45,6 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('list/available-data', 'Api\WasteController@availableListData');
         Route::post('request-waste', 'Api\WasteController@requestWaste');
         Route::post('show', 'Api\WasteController@show');
+        Route::post('delete', 'Api\WasteController@delete');
     });
 });

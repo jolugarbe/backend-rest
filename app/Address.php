@@ -41,7 +41,7 @@ class Address extends Model
     }
 
     public function getNotificationData(){
-        return $this->belongsTo('App\NotificationData', 'address_id', 'id');
+        return $this->hasOne('App\NotificationData', 'address_id', 'id');
     }
 
     public function getWaste(){
@@ -49,6 +49,6 @@ class Address extends Model
     }
 
     public function getUser(){
-        return $this->belongsTo('App\User', 'address_id', 'id');
+        return $this->hasOne('App\User', 'address_id', 'id');
     }
 }

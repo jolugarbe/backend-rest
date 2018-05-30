@@ -249,9 +249,10 @@ class WasteController extends Controller
             ->of($waste)
             ->addColumn('action', function (Waste $waste) {
                 $url_update = "http://frontend.local/waste/update/".$waste->id;
+                $url_delete = "http://frontend.local/waste/delete/".$waste->id;
                 $links = '';
                 $links .= '<a href="'.$url_update.'" class="btn btn-success" ></i>Editar</a>';
-                $links .= '<a href="'.URL::to("").'" id="'.$waste->id.'" class="btn btn-danger">Borrar</a>';
+                $links .= '<a href="'.$url_delete.'" id="'.$waste->id.'" data-waste_id="'.$waste->id.'" class="delete-waste btn btn-danger">Borrar</a>';
 
                 return $links;
             })
@@ -352,6 +353,30 @@ class WasteController extends Controller
 
         }catch (\Exception $exception){
             return response()->json(['exception' => $exception->getMessage()], 500);
+        }
+    }
+
+    public function delete(Request $request){
+        $input = $request->all();
+        DB::beginTransaction();
+        try{
+            $user = Auth::user();
+            $waste = $this->wasteRepo->findOrFail($input['waste_id']);
+
+            if($waste->getCreator->getId() == $user->getId())
+            {
+                $waste->delete();
+            }else{
+                return response()->json(['exception' => "unauthorized", 'message' => "No tiene permiso para eliminar este residuo."], 500);
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => "Residuo eliminado correctamente."
+            ], 200);
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return response()->json(['exception' => $exception, 'message' => "Se ha producido un error al eliminar el residuo."], 500);
         }
     }
 }

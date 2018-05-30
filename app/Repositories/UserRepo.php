@@ -81,4 +81,51 @@ class UserRepo extends BaseRepo
 
         return $user;
     }
+
+    public function updateUser($user, $name, $activity, $business_name, $cif, $address_line, $postal_code, $province, $locality, $contact_person, $telephone, $email, $not_address_line, $not_contact_person, $not_email, $not_locality, $not_postal_code, $not_province, $not_telephone, $carbon_footprint, $carbon_inscription, $notification_data){
+
+        // Address for user
+        $address = $user->getAddress;
+        $address->setAddressLine($address_line);
+        $address->setPostalCode($postal_code);
+        $address->setLocalityId($locality);
+        $address = $this->updateWithoutData($address);
+
+        // User
+        $user->setAddressId($address->getId());
+        $user->setName($name);
+        $user->setActivityId($activity);
+        $user->setBusinessName($business_name);
+        $user->setCif($cif);
+        $user->setContactPerson($contact_person);
+        $user->setTelephone($telephone);
+        $user->setEmail($email);
+        $user->setCarbonFootprint($carbon_footprint);
+
+        if($carbon_footprint == 1)
+            $user->setCarbonInscription(Carbon::createFromFormat('d/m/Y', $carbon_inscription));
+        else
+            $user->setCarbonInscription(null);
+
+        $user = $this->updateWithoutData($user);
+
+        if($notification_data){
+            // Address for notification_data
+            $not_address = $user->getNotificationData->getAddress;
+            $not_address->setAddressLine($not_address_line);
+            $not_address->setPostalCode($not_postal_code);
+            $not_address->setLocalityId($not_locality);
+            $not_address = $this->updateWithoutData($not_address);
+
+            // Notification data
+            $notification = $user->getNotificationData;
+            $notification->setAddressId($not_address->getId());
+            $notification->setContactPerson($not_contact_person);
+            $notification->setTelephone($not_telephone);
+            $notification->setEmail($not_email);
+            $notification = $this->updateWithoutData($notification);
+        }
+
+        return $user;
+    }
 }
