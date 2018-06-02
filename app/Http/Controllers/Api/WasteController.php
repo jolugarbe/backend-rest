@@ -247,22 +247,32 @@ class WasteController extends Controller
         $waste = $this->wasteRepo->userOffersData($user);
         return datatables()
             ->of($waste)
+            ->editColumn('t_ad_id', function (Waste $waste) {
+                $type = '';
+                if ($waste->t_ad_id == 1)
+                    $type .= '<span class="badge badge-primary">Oferta</span>';
+                else
+                    $type .= '<span class="badge badge-purple text-white">Demanda</span>';
+
+                return $type;
+            })
             ->addColumn('action', function (Waste $waste) {
                 $url_update = "http://frontend.local/waste/update/".$waste->id;
                 $url_delete = "http://frontend.local/waste/delete/".$waste->id;
                 $links = '';
-                $links .= '<a href="'.$url_update.'" class="btn btn-success" ></i>Editar</a>';
-                $links .= '<a href="'.$url_delete.'" id="'.$waste->id.'" data-waste_id="'.$waste->id.'" class="delete-waste btn btn-danger">Borrar</a>';
+                $links .= '<a href="'.$url_update.'" class="btn btn-square btn-success" ><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>';
+                $links .= '<a href="'.$url_delete.'" id="'.$waste->id.'" data-waste_id="'.$waste->id.'" class="delete-waste btn btn-square btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>';
 
                 return $links;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 't_ad_id'])
             ->toJson();
     }
 
     public function availableListData(Request $request){
         $user = Auth::user();
-        $waste = $this->wasteRepo->availableData($user);
+        $name = $request->input('f_name');
+        $waste = $this->wasteRepo->availableData($user, $name);
         return datatables()
             ->of($waste)
             ->addColumn('action', function (Waste $waste) {

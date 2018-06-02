@@ -99,18 +99,20 @@ class WasteRepo extends BaseRepo
     {
         $query = $this->getModel()
             ->where('creator_user_id', '=', $user->getId())
-            ->whereNull('owner_user_id')
-            ->where('t_ad_id', '=', 1);
+            ->whereNull('owner_user_id');
 
         return $query;
     }
 
-    public function availableData($user)
+    public function availableData($user, $name = null)
     {
         $query = $this->getModel()
             ->where('creator_user_id', '!=', $user->getId())
             ->whereNull('owner_user_id')
             ->where('t_ad_id', '=', 1);
+
+        if($name)
+            $query = $query->where('name', 'like', '%'.$name.'%');
 
         return $query;
     }
