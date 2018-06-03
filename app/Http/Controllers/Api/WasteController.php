@@ -13,6 +13,7 @@ use App\Repositories\TransferRepo;
 use App\Repositories\WasteRepo;
 use App\Repositories\WasteTypeRepo;
 use App\Waste;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -243,8 +244,17 @@ class WasteController extends Controller
     }
 
     public function userOffersData(Request $request){
+        Log::info('REQUEST DATATABLE: '. json_encode($request->all()));
+        Log::info('ordering: '. json_encode($request->get('order')[0]['column']));
         $user = Auth::user();
-        $waste = $this->wasteRepo->userOffersData($user);
+        $f_name = $request->input('f_name');
+        $f_waste_type = $request->input('f_waste_type');
+        $f_cer_code = $request->input('f_cer_code');
+        $f_generation_date = $request->input('f_generation_date');
+        $f_dangerous = $request->input('f_dangerous');
+        $f_ad_type = $request->input('f_ad_type');
+        $waste = $this->wasteRepo->userOffersData($user, $f_name, $f_waste_type, $f_cer_code, $f_generation_date, $f_dangerous, $f_ad_type);
+
         return datatables()
             ->of($waste)
             ->editColumn('t_ad_id', function (Waste $waste) {
@@ -256,6 +266,19 @@ class WasteController extends Controller
 
                 return $type;
             })
+            ->editColumn('dangerous', function (Waste $waste) {
+                if ($waste->dangerous == 1)
+                    return "SÍ";
+                else
+                   return "NO";
+            })
+            ->editColumn('quantity', function (Waste $waste) {
+                $quantity = $waste->quantity . " " . $waste->measured_unit;
+                return $quantity;
+            })
+            ->editColumn('generation_date', function (Waste $waste) {
+                return Carbon::createFromFormat('Y-m-d', $waste->generation_date)->format('d/m/Y');
+            })
             ->addColumn('action', function (Waste $waste) {
                 $url_update = "http://frontend.local/waste/update/".$waste->id;
                 $url_delete = "http://frontend.local/waste/delete/".$waste->id;
@@ -265,7 +288,7 @@ class WasteController extends Controller
 
                 return $links;
             })
-            ->rawColumns(['action', 't_ad_id'])
+            ->rawColumns(['action', 't_ad_id', 'quantity'])
             ->toJson();
     }
 

@@ -13,6 +13,7 @@ use App\Address;
 use App\Waste;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class WasteRepo extends BaseRepo
 {
@@ -95,12 +96,34 @@ class WasteRepo extends BaseRepo
         return $waste;
     }
 
-    public function userOffersData($user)
+    public function userOffersData($user, $f_name = null, $f_waste_type = null, $f_cer_code = null, $f_generation_date = null, $f_dangerous = null, $f_ad_type = null)
     {
         $query = $this->getModel()
-            ->where('creator_user_id', '=', $user->getId())
-            ->whereNull('owner_user_id');
+            ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
+            ->where('waste.creator_user_id', '=', $user->getId())
+            ->whereNull('waste.owner_user_id');
 
+        // Filters
+        if($f_name)
+            $query = $query->where('waste.name', 'like', '%'.$f_name.'%');
+
+        if($f_waste_type)
+            $query = $query->where('waste.t_waste_id', '=', $f_waste_type);
+
+        if($f_cer_code)
+            $query = $query->where('waste.cer_code', 'like', '%'.$f_cer_code.'%');
+
+        if($f_generation_date)
+            $query = $query->where('waste.generation_date', '=', Carbon::createFromFormat('d/m/Y', $f_generation_date)->format('Y-m-d'));
+
+        if($f_dangerous != 'all')
+            $query = $query->where('waste.dangerous', '=', $f_dangerous);
+
+        if($f_ad_type)
+            $query = $query->where('waste.t_ad_id', '=', $f_ad_type);
+        // End Filters
+
+        $query = $query->select('waste.id', 'waste.quantity', 'waste.composition','waste.measured_unit', 'waste.name', 'waste.t_ad_id', 'waste.cer_code', 'waste.generation_date', 'waste.dangerous', 'waste_type.name as type');
         return $query;
     }
 
