@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Validator;
 
@@ -87,6 +88,7 @@ class UserController extends Controller
             return response()->json(['user' => $user, 'address' => $address, 'province_id' => $province_id, 'not_address' => $not_address, 'not_province_id' => $not_province_id, 'notification' => $notification, 'activities' => $activities, 'provinces' => $provinces, 'localities' => $localities], 200);
 
         }catch (\Exception $exception){
+            Log::error('PROFILE DATA ERROR: ' . $exception->getMessage());
             return response()->json(['exception' => $exception->getMessage()], 500);
         }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Address;
+use App\NotificationData;
 use App\User;
 use App\Waste;
 use Illuminate\Database\Seeder;
@@ -63,6 +64,20 @@ class UsersTableSeeder extends Seeder
             ]);
 
             $user->assignRole('user');
+
+            $address_not = Address::firstOrCreate([
+                'address_line' => str_random('25'),
+                'postal_code' => random_int(5,5),
+                'locality_id' => random_int(1, 8116)
+            ]);
+
+            $notification_data = NotificationData::firstOrCreate([
+                'address_id' => $address_not->id,
+                'contact_person' => $user->name,
+                'email' => $user->email,
+                'telephone' => $user->telephone,
+                'user_id' => $user->id
+            ]);
 
             for($j = 1; $j <= random_int(1, 7); $j++)
             {
