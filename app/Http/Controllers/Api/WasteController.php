@@ -244,8 +244,6 @@ class WasteController extends Controller
     }
 
     public function userOffersData(Request $request){
-        Log::info('REQUEST DATATABLE: '. json_encode($request->all()));
-        Log::info('ordering: '. json_encode($request->get('order')[0]['column']));
         $user = Auth::user();
         $f_name = $request->input('f_name');
         $f_waste_type = $request->input('f_waste_type');
@@ -311,13 +309,29 @@ class WasteController extends Controller
 
     public function userTransfersData(Request $request){
         $user = Auth::user();
-        $waste = $this->wasteRepo->userTransfersData($user);
+        $f_name = $request->input('f_name');
+        $f_waste_type = $request->input('f_waste_type');
+        $f_cer_code = $request->input('f_cer_code');
+        $f_pickup_date = $request->input('f_pickup_date');
+        $f_request_name = $request->input('f_request_name');
+        $f_request_date = $request->input('f_request_date');
+        $waste = $this->wasteRepo->userTransfersData($user, $f_name, $f_waste_type, $f_cer_code, $f_pickup_date, $f_request_name, $f_request_date);
         return datatables()
             ->of($waste)
+            ->editColumn('quantity', function (Waste $waste) {
+                $quantity = $waste->quantity . " " . $waste->measured_unit;
+                return $quantity;
+            })
+            ->editColumn('pickup_date', function (Waste $waste) {
+                return Carbon::createFromFormat('Y-m-d', $waste->pickup_date)->format('d/m/Y');
+            })
+            ->editColumn('request_date', function (Waste $waste) {
+                return Carbon::createFromFormat('Y-m-d', $waste->request_date)->format('d/m/Y');
+            })
             ->addColumn('action', function (Waste $waste) {
                 $url_show = "http://frontend.local/waste/show/".$waste->id;
                 $links = '';
-                $links .= '<a href="'.$url_show.'" class="btn btn-success" ></i>Ver datos</a>';
+                $links .= '<a href="'.$url_show.'" class="btn btn-success"></i>Ver datos</a>';
 
                 return $links;
             })
@@ -327,9 +341,25 @@ class WasteController extends Controller
 
     public function userRequestsData(Request $request){
         $user = Auth::user();
-        $waste = $this->wasteRepo->userRequestsData($user);
+        $f_name = $request->input('f_name');
+        $f_waste_type = $request->input('f_waste_type');
+        $f_cer_code = $request->input('f_cer_code');
+        $f_pickup_date = $request->input('f_pickup_date');
+        $f_creator_name = $request->input('f_creator_name');
+        $f_request_date = $request->input('f_request_date');
+        $waste = $this->wasteRepo->userRequestsData($user, $f_name, $f_waste_type, $f_cer_code, $f_pickup_date, $f_creator_name, $f_request_date);
         return datatables()
             ->of($waste)
+            ->editColumn('quantity', function (Waste $waste) {
+                $quantity = $waste->quantity . " " . $waste->measured_unit;
+                return $quantity;
+            })
+            ->editColumn('pickup_date', function (Waste $waste) {
+                return Carbon::createFromFormat('Y-m-d', $waste->pickup_date)->format('d/m/Y');
+            })
+            ->editColumn('request_date', function (Waste $waste) {
+                return Carbon::createFromFormat('Y-m-d', $waste->request_date)->format('d/m/Y');
+            })
             ->addColumn('action', function (Waste $waste) {
                 $url_show = "http://frontend.local/waste/show/".$waste->id;
                 $links = '';
