@@ -329,9 +329,11 @@ class WasteController extends Controller
                 return Carbon::createFromFormat('Y-m-d', $waste->request_date)->format('d/m/Y');
             })
             ->addColumn('action', function (Waste $waste) {
-                $url_show = "http://frontend.local/waste/show/".$waste->id;
+                $url_show_waste = "http://frontend.local/waste/show/".$waste->id;
+                $url_show_transfer = "http://frontend.local/waste/user/show-transfer/".$waste->transfer_id;
                 $links = '';
-                $links .= '<a href="'.$url_show.'" class="btn btn-success"></i>Ver datos</a>';
+                $links .= '<a href="'.$url_show_waste.'" class="btn btn-success"></i>Ver residuo</a>';
+                $links .= '<a href="'.$url_show_transfer.'" class="btn btn-success"></i>Ver Cesión</a>';
 
                 return $links;
             })
@@ -362,8 +364,10 @@ class WasteController extends Controller
             })
             ->addColumn('action', function (Waste $waste) {
                 $url_show = "http://frontend.local/waste/show/".$waste->id;
+                $url_show_request = "http://frontend.local/waste/user/show-request/".$waste->transfer_id;
                 $links = '';
-                $links .= '<a href="'.$url_show.'" class="btn btn-success" ></i>Ver datos</a>';
+                $links .= '<a href="'.$url_show.'" class="btn btn-success" ></i>Ver residuo</a>';
+                $links .= '<a href="'.$url_show_request.'" class="btn btn-success" ></i>Ver solicitud</a>';
 
                 return $links;
             })
@@ -440,6 +444,46 @@ class WasteController extends Controller
         }catch (\Exception $exception){
             DB::rollBack();
             return response()->json(['exception' => $exception, 'message' => "Se ha producido un error al eliminar el residuo."], 500);
+        }
+    }
+
+    public function showTransferRequest(Request $request) {
+        try{
+            $user = Auth::user();
+            $input = $request->all();
+            $transfer = $this->transferRepo->findOrFail($input['transfer_id']);
+            $waste = $transfer->getWaste;
+            $adType = $waste->getAdType->getName();
+            $frequency = $waste->getFrequency->getName();
+            $type = $waste->getWasteType->getName();
+//            $localities = $this->localityRepo->allOrderByName('asc');
+//            $provinces = $this->provinceRepo->allOrderByName('asc');
+            $address = $this->addressRepo->findOrFail($waste['address_id']);
+            $locality = $address->getLocality->getName();
+            $province = $address->getLocality->getProvince->getName();
+
+            $owner_user = $transfer->getOwnerWaste;
+            $owner_activity = $owner_user->getActivity->getName();
+            $owner_address = $owner_user->getAddress;
+            $owner_locality = $owner_address->getLocality->getName();
+            $owner_province = $owner_address->getLocality->getProvince->getName();
+
+            $request_user = $transfer->getApplicantUser;
+            $request_activity = $request_user->getActivity->getName();
+            $request_address = $request_user->getAddress;
+            $request_locality = $request_address->getLocality->getName();
+            $request_province = $request_address->getLocality->getProvince->getName();
+
+
+            if($transfer['owner_user_id'] == $user->getId() || $transfer['applicant_user_id'] == $user->getId())
+            {
+                return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province, 'owner_user' => $owner_user, 'owner_activity' => $owner_activity, 'owner_address' => $owner_address, 'owner_locality' => $owner_locality, 'owner_province' => $owner_province, 'request_user' => $request_user, 'request_activity' => $request_activity, 'request_address' => $request_address, 'request_locality' => $request_locality, 'request_province' => $request_province], 200);
+            }else {
+                return response()->json(['exception' => 'No tienes permiso para ver esta operación.'], 403);
+            }
+
+        }catch (\Exception $exception){
+            return response()->json(['exception' => $exception->getMessage()], 500);
         }
     }
 }

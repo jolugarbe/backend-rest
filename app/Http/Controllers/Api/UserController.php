@@ -82,8 +82,8 @@ class UserController extends Controller
             $not_address = $notification->getAddress;
             $not_province_id = $not_address->getLocality->getProvince->getId();
             $activities = $this->activityRepo->all();
-            $provinces = $this->provinceRepo->allOrderByName('desc');
-            $localities = $this->localityRepo->allOrderByName('desc');
+            $provinces = $this->provinceRepo->allOrderByName('asc');
+            $localities = $this->localityRepo->allOrderByName('asc');
 
             return response()->json(['user' => $user, 'address' => $address, 'province_id' => $province_id, 'not_address' => $not_address, 'not_province_id' => $not_province_id, 'notification' => $notification, 'activities' => $activities, 'provinces' => $provinces, 'localities' => $localities], 200);
 

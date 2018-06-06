@@ -46,5 +46,6 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('request-waste', 'Api\WasteController@requestWaste');
         Route::post('show', 'Api\WasteController@show');
         Route::post('delete', 'Api\WasteController@delete');
+        Route::post('user/show-transfer-request', 'Api\WasteController@showTransferRequest');
     });
 });
