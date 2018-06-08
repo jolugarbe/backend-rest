@@ -326,6 +326,47 @@ class WasteController extends Controller
             ->toJson();
     }
 
+    public function demandListData(Request $request){
+        $user = Auth::user();
+        $f_name = $request->input('f_name');
+        $f_waste_type = $request->input('f_waste_type');
+        $f_cer_code = $request->input('f_cer_code');
+//        $f_pickup_date = $request->input('f_pickup_date');
+        $f_creator_name = $request->input('f_creator_name');
+//        $f_generation_date = $request->input('f_generation_date');
+        $f_dangerous = $request->input('f_dangerous');
+        $f_publication_date_1 = $request->input('f_publication_date_1');
+        $f_publication_date_2 = $request->input('f_publication_date_2');
+        $waste = $this->wasteRepo->demandData($user, $f_name, $f_waste_type, $f_cer_code, null, $f_creator_name, null, $f_dangerous, $f_publication_date_1, $f_publication_date_2);
+        return datatables()
+            ->of($waste)
+            ->editColumn('quantity', function (Waste $waste) {
+                $quantity = $waste->quantity . " " . $waste->measured_unit;
+                return $quantity;
+            })
+//            ->editColumn('pickup_date', function (Waste $waste) {
+//                return Carbon::createFromFormat('Y-m-d', $waste->pickup_date)->format('d/m/Y');
+//            })
+//            ->editColumn('generation_date', function (Waste $waste) {
+//                return Carbon::createFromFormat('Y-m-d', $waste->generation_date)->format('d/m/Y');
+//            })
+            ->editColumn('publication_date', function (Waste $waste) {
+                return Carbon::createFromFormat('Y-m-d H:i:s', $waste->publication_date)->format('d/m/Y');
+            })
+            ->editColumn('dangerous', function (Waste $waste) {
+                return $waste->dangerous == 1 ? "SÍ" : "NO";
+            })
+            ->addColumn('action', function (Waste $waste) {
+                $url_demand = "http://frontend.local/waste/demand/".$waste->id;
+                $links = '';
+                $links .= '<a class="btn btn-success request-waste" data-waste_id="'.$waste->id.'" ></i>Solicitar</a>';
+
+                return $links;
+            })
+            ->rawColumns(['action'])
+            ->toJson();
+    }
+
     public function userTransfersData(Request $request){
         $user = Auth::user();
         $f_name = $request->input('f_name');
@@ -431,12 +472,13 @@ class WasteController extends Controller
             $locality = $address->getLocality->getName();
             $province = $address->getLocality->getProvince->getName();
 
-            if($waste['owner_user_id'] == $user->getId())
-            {
-                return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province], 200);
-            }else {
-                return response()->json(['exception' => 'No tienes permiso para ver este residuo.'], 403);
-            }
+            return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province], 200);
+//            if($waste['owner_user_id'] == $user->getId())
+//            {
+//                return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province], 200);
+//            }else {
+//                return response()->json(['exception' => 'No tienes permiso para ver este residuo.'], 403);
+//            }
 
         }catch (\Exception $exception){
             return response()->json(['exception' => $exception->getMessage()], 500);

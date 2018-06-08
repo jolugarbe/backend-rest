@@ -164,6 +164,49 @@ class WasteRepo extends BaseRepo
         return $query;
     }
 
+    public function demandData($user, $f_name = null, $f_waste_type = null, $f_cer_code = null, $f_pickup_date = null, $f_creator_name = null, $f_generation_date = null, $f_dangerous = null, $f_publication_date_1 = null, $f_publication_date_2 = null)
+    {
+        $query = $this->getModel()
+            ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
+            ->join('users', 'users.id', '=', 'waste.creator_user_id')
+            ->where('creator_user_id', '!=', $user->getId())
+            ->whereNull('owner_user_id')
+            ->where('t_ad_id', '=', 2);
+
+        // Filters
+        if($f_name)
+            $query = $query->where('waste.name', 'like', '%'.$f_name.'%');
+
+        if($f_waste_type)
+            $query = $query->where('waste.t_waste_id', '=', $f_waste_type);
+
+        if($f_cer_code)
+            $query = $query->where('waste.cer_code', 'like', '%'.$f_cer_code.'%');
+
+        if($f_pickup_date)
+            $query = $query->where('waste.pickup_date', '=', Carbon::createFromFormat('d/m/Y', $f_pickup_date)->format('Y-m-d'));
+
+        if($f_creator_name)
+            $query = $query->where('users.business_name', 'like', '%'.$f_creator_name.'%');
+
+        if($f_generation_date)
+            $query = $query->where('waste.generation_date', '=', Carbon::createFromFormat('d/m/Y', $f_generation_date)->format('Y-m-d'));
+
+        if($f_dangerous != 'all')
+            $query = $query->where('waste.dangerous', '=', $f_dangerous);
+
+        if($f_publication_date_1)
+            $query = $query->where('waste.created_at', '>=', Carbon::createFromFormat('d/m/Y', $f_publication_date_1)->subDay()->format('Y-m-d H:i:s'));
+
+        if($f_publication_date_2)
+            $query = $query->where('waste.created_at', '<=', Carbon::createFromFormat('d/m/Y', $f_publication_date_2)->format('Y-m-d H:i:s'));
+        // End Filters
+
+        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as creator_name', 'waste.generation_date as generation_date', 'waste_type.name as type', 'waste.dangerous', 'waste.created_at as publication_date');
+
+        return $query;
+    }
+
     public function userTransfersData($user, $f_name = null, $f_waste_type = null, $f_cer_code = null, $f_pickup_date = null, $f_request_name = null, $f_request_date = null)
     {
         $query = $this->getModel()
