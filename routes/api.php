@@ -23,6 +23,9 @@ Route::get('waste/create-data', 'Api\WasteController@allCreateData');
 
 Route::post('register', 'Api\AuthController@register');
 Route::post('login', 'Api\AuthController@login');
+Route::post('email-reset', 'Api\AuthController@emailReset');
+Route::post('reset-pass/check-token', 'Api\AuthController@checkTokenResetPass');
+Route::post('reset-pass/update-password', 'Api\AuthController@resetUpdatePassword');
 
 // Auth routes
 Route::group(['middleware' => 'auth:api'], function () {

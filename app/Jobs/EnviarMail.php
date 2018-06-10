@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 
@@ -65,10 +66,10 @@ class EnviarMail extends Job implements ShouldQueue
                     'allow_self_signed' => true
                 )
             );
-            $mail->Host = env('MAIL_HOST', 'mail.10code.es');
-            $mail->Port = env('MAIL_PORT', '587');
-            $mail->Username = env('MAIL_USERNAME', 'info@10code.es');
-            $mail->Password = env('MAIL_PASSWORD', 'Codeinfo10');
+            $mail->Host = env('MAIL_HOST', 'smtp.mailtrap.io');
+            $mail->Port = env('MAIL_PORT', '2525');
+            $mail->Username = env('MAIL_USERNAME', 'b9f9c018a4ca9b');
+            $mail->Password = env('MAIL_PASSWORD', '9539ed165ff014');
 
 
             $mail->setFrom($this->origen, $this->nombre_origen);
@@ -86,7 +87,7 @@ class EnviarMail extends Job implements ShouldQueue
         } catch (phpmailerException $e) {
             dd($e);
         } catch (Exception $e) {
-            dd($e);
+            Log::error('ERROR ENVIAR EMAIL: '. $e->getMessage());
         }
         //die('success');
     }
