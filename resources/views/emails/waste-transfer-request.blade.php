@@ -70,9 +70,9 @@
 <body style="background-color: #f3f5f7; margin: 0 !important; padding: 0 !important;">
 
 <!-- HIDDEN PREHEADER TEXT -->
-<div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Lato', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
-    {{--Looks like you tried signing in a few too many times. Let's see if we can get you back into your account.--}}
-</div>
+{{--<div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Lato', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">--}}
+{{--We're thrilled to have you here! Get ready to dive into your new account.--}}
+{{--</div>--}}
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <!-- LOGO -->
@@ -110,7 +110,7 @@
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                 <tbody><tr>
                     <td bgcolor="#ffffff" align="center" valign="top" style="padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;">
-                        <h1 style="font-size: 42px; font-weight: 400; margin: 0;">¿No puedes acceder?</h1>
+                        <h1 style="font-size: 42px; font-weight: 400; margin: 0;">@if($is_owner) ¡Solicitud recibida! @else ¡Solicitud enviada! @endif</h1>
                     </td>
                 </tr>
                 </tbody></table>
@@ -133,7 +133,9 @@
                 <!-- COPY -->
                 <tbody><tr>
                     <td bgcolor="#ffffff" align="left" style="padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
-                        <p style="margin: 0;">Has solicitado cambiar tu contraseña. Restablecerla es muy fácil. Simplemente haz click en el botón de abajo y establece tu nueva contraseña.</p>
+                        <p style="margin: 0;">Has @if($is_owner) recibido @else enviado @endif una solicitud de cesión del residuo:</p>
+                        <p style="text-align: center"><strong>{{$waste->getName()}}</strong></p>
+                        <p style="text-align: justify">Puedes consultar todos los datos del residuo así como de la empresa @if($is_owner) solicitante @else propietaria @endif del mismo en tu cuenta. <strong>@if($is_owner) "Mis Residuos/Cesiones" @else "Mis Residuos/Solicitudes" @endif</strong></p>
                     </td>
                 </tr>
                 <!-- BULLETPROOF BUTTON -->
@@ -141,10 +143,10 @@
                     <td bgcolor="#ffffff" align="left">
                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                             <tbody><tr>
-                                <td bgcolor="#ffffff" align="center" style="padding: 20px 30px 30px 30px;">
+                                <td bgcolor="#ffffff" align="center" style="padding: 20px 30px 60px 30px;">
                                     <table border="0" cellspacing="0" cellpadding="0">
                                         <tbody><tr>
-                                            <td align="center" style="border-radius: 3px;" bgcolor="#33cabb"><a href="http://frontend.local/token/reset/password/{{$token}}" target="_blank" style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 12px 50px; border-radius: 2px; border: 1px solid #33cabb; display: inline-block;">Restaurar Contraseña</a></td>
+                                            <td align="center" style="border-radius: 3px;" bgcolor="#33cabb"><a @if($is_owner) href="http://frontend.local/waste/user/transfers" @else href="http://frontend.local/waste/user/requests" @endif target="_blank" style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 12px 50px; border-radius: 2px; border: 1px solid #33cabb; display: inline-block;">Acceder</a></td>
                                         </tr>
                                         </tbody></table>
                                 </td>
@@ -154,8 +156,8 @@
                 </tr>
                 <!-- COPY -->
                 <tr>
-                    <td bgcolor="#ffffff" align="left" style="padding: 0px 30px 20px 30px; color: #aaaaaa; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 400; line-height: 25px;">
-                        <p style="margin: 0; text-align: center;">Si no hizo esta solicitud, simplemente ignore este correo electrónico. De lo contrario, haga clic en el botón de arriba para cambiar su contraseña.</p>
+                    <td bgcolor="#ffffff" align="left" style="padding: 0px 30px 20px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
+                        <p style="margin: 0; text-align: justify">Contacta con la empresa @if($is_owner) solicitante @else propietaria @endif para concretar las condiciones de la cesión del residuo. @if($is_owner)Recuerda que puedes aceptar o rechazar la solicitud desde tu panel de administración. @else Recuerda que puedes comprobar el estado de la solicitud desde tu panel de control. @endif </p>
                     </td>
                 </tr>
                 <!-- COPY -->
@@ -208,26 +210,26 @@
                 <!-- NAVIGATION -->
                 <tbody>
                 {{--<tr>--}}
-                    {{--<td bgcolor="#f4f4f4" align="left" style="padding: 30px 30px 30px 30px; color: #aaaaaa; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 18px;">--}}
-                        {{--<p style="margin: 0;">--}}
-                            {{--<a href="http://thetheme.io" target="_blank" style="color: #999999; font-weight: 700;">Dashboard</a> ---}}
-                            {{--<a href="http://thetheme.io" target="_blank" style="color: #999999; font-weight: 700;">Billing</a> ---}}
-                            {{--<a href="http://thetheme.io" target="_blank" style="color: #999999; font-weight: 700;">Help</a>--}}
-                        {{--</p>--}}
-                    {{--</td>--}}
+                {{--<td bgcolor="#f4f4f4" align="left" style="padding: 30px 30px 30px 30px; color: #aaaaaa; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 18px;">--}}
+                {{--<p style="margin: 0;">--}}
+                {{--<a href="http://thetheme.io" target="_blank" style="color: #999999; font-weight: 700;">Dashboard</a> ---}}
+                {{--<a href="http://thetheme.io" target="_blank" style="color: #999999; font-weight: 700;">Billing</a> ---}}
+                {{--<a href="http://thetheme.io" target="_blank" style="color: #999999; font-weight: 700;">Help</a>--}}
+                {{--</p>--}}
+                {{--</td>--}}
                 {{--</tr>--}}
                 <!-- PERMISSION REMINDER -->
                 <tr>
                     <td bgcolor="#f4f4f4" align="left" style="padding: 0px 30px 30px 30px; color: #aaaaaa; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 18px;">
-                        <p style="margin: 0;">Has recibido este correo electrónico por has olvidado tu contraseña de acceso.</p>
-                            {{--<a href="http://thetheme.io" target="_blank" style="color: #999999; font-weight: 700;">view it in your browser</a>.</p>--}}
+                        <p style="margin: 0;">Has recibido este correo porque estás registrado en la bolsa de residuos reutilizables y reciclables. </p>
+                        {{--<a href="http://thetheme.io" target="_blank" style="color: #999999; font-weight: 700;">view it in your browser</a>.</p>--}}
                     </td>
                 </tr>
                 <!-- UNSUBSCRIBE -->
                 {{--<tr>--}}
-                    {{--<td bgcolor="#f4f4f4" align="left" style="padding: 0px 30px 30px 30px; color: #aaaaaa; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;">--}}
-                        {{--<p style="margin: 0;">If these emails get annoying, please feel free to <a href="http://thetheme.io" target="_blank" style="color: #999999; font-weight: 700;">unsubscribe</a>.</p>--}}
-                    {{--</td>--}}
+                {{--<td bgcolor="#f4f4f4" align="left" style="padding: 0px 30px 30px 30px; color: #aaaaaa; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;">--}}
+                {{--<p style="margin: 0;">If these emails get annoying, please feel free to <a href="http://thetheme.io" target="_blank" style="color: #999999; font-weight: 700;">unsubscribe</a>.</p>--}}
+                {{--</td>--}}
                 {{--</tr>--}}
                 <!-- ADDRESS -->
                 <tr>

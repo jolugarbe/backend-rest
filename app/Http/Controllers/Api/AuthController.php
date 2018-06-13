@@ -72,7 +72,7 @@ class AuthController extends Controller
         $telephone = $input['telephone'];
         $email = $input['email'];
         $carbon_footprint = $input['carbon_footprint'];
-        $password = "123456";
+        $password = str_random(9);
         $carbon_inscription = array_key_exists('carbon_inscription', $input) ? $input['carbon_inscription'] : null;
         $notification_data = array_key_exists('notification_data', $input) ? true : null;
         $not_address_line = array_key_exists('not_address_line', $input) ? $input['not_address_line'] : null;
@@ -94,19 +94,19 @@ class AuthController extends Controller
 
             DB::commit();
 
-            //        $contenido=\View::make('mails.confirmation', compact('email', 'token'))->render();
-//
-//        $datos=[$data['email'],
-//            $data['email'],
-//            'info@thedoger.com',
-//            'Doger',
-//            'Confirmación de registro',
-//            $contenido,
-//            null,
-//            null];
-//
-//        $mail=new EnviarMail($datos);
-//        $this->dispatch($mail);
+            $contenido = \View::make('emails.user-welcome',  compact('password', 'email'))->render();
+            $datos=[
+                $email,
+                $email,
+                'contacto@bolsaderesiduos.com',
+                'Contacto',
+                'CAFA | Datos de Acceso a la Bolsa de Residuos Reutilizables y Reciclables',
+                $contenido,
+                null,
+                null];
+
+            $mail=new EnviarMail($datos);
+            $this->dispatch($mail);
 
             return response()->json([
                 'token' => $token,

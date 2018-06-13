@@ -47,4 +47,12 @@ class Transfer extends Model
     public function setWasteId($value){
         $this->waste_id = $value;
     }
+
+    public function getStatus(){
+        return $this->belongsTo('App\StatusType', 'status_id', 'id');
+    }
+
+    public function setStatusId($value){
+        $this->status_id = $value;
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Jobs\EnviarMail;
 use App\Locality;
 use App\Province;
 use App\Repositories\AddressRepo;
@@ -448,9 +449,43 @@ class WasteController extends Controller
             $waste->save();
 
             DB::commit();
+
+            // Send to the owner of the waste
+            $is_owner = true;
+            $contenido = \View::make('emails.waste-transfer-request', compact('waste', 'is_owner'))->render();
+            $datos=[
+                $owner->getEmail(),
+                $owner->getEmail(),
+                'admin@bolsacafa.com',
+                'Admin',
+                'Solicitud de cesión de residuo recibida',
+                $contenido,
+                null,
+                null];
+
+            $mail=new EnviarMail($datos);
+            $this->dispatch($mail);
+
+//            // Send to the waste user request
+            $is_owner = false;
+            $contenido = \View::make('emails.waste-transfer-request', compact('waste', 'is_owner'))->render();
+            $datos=[
+                $user->getEmail(),
+                $user->getEmail(),
+                'admin@bolsacafa.com',
+                'Admin',
+                'Solicitud de cesión de residuo enviada',
+                $contenido,
+                null,
+                null];
+
+            $mail=new EnviarMail($datos);
+            $this->dispatch($mail);
+
             return response()->json([
                 'message' => "Solicitud tramitada correctamente."
             ], 200);
+
         }catch (\Exception $exception){
             DB::rollBack();
             return response()->json(['exception' => $exception, 'message' => "Se ha producido un error al tramitar la solicitud."], 500);

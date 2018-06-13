@@ -27,6 +27,7 @@ class TransferRepo extends BaseRepo
         $transfer->setApplicantUserId($request_user_id);
         $transfer->setWasteId($waste_id);
         $transfer->setTransferDate(Carbon::now());
+        $transfer->setStatusId(1);
         $transfer = $this->updateWithoutData($transfer);
         return $transfer;
     }
