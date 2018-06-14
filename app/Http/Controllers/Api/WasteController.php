@@ -379,6 +379,28 @@ class WasteController extends Controller
         $waste = $this->wasteRepo->userTransfersData($user, $f_name, $f_waste_type, $f_cer_code, $f_pickup_date, $f_request_name, $f_request_date);
         return datatables()
             ->of($waste)
+            ->editColumn('name', function (Waste $waste) {
+                $name = '<a href="http://frontend.local/waste/show/'.$waste->id.'" target="_blank">'.$waste->name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+                return $name;
+            })
+            ->editColumn('request_name', function (Waste $waste) {
+                $link = '<a href="http://frontend.local/user/show/'.$waste->owner_user_id.'" target="_blank">'.$waste->request_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+
+                return $link;
+            })
+            ->editColumn('status', function (Waste $waste) {
+                $type = '';
+                if ($waste->status_id == 1)
+                    $type .= '<span class="badge badge-yellow">'.$waste->status.'</span>';
+                elseif($waste->status_id == 2)
+                    $type .= '<span class="badge badge-danger text-white">'.$waste->status.'</span>';
+                elseif($waste->status_id == 3)
+                    $type .= '<span class="badge badge-danger text-white">'.$waste->status.'</span>';
+                elseif($waste->status_id == 4)
+                    $type .= '<span class="badge badge-primary text-white">'.$waste->status.'</span>';
+
+                return $type;
+            })
             ->editColumn('quantity', function (Waste $waste) {
                 $quantity = $waste->quantity . " " . $waste->measured_unit;
                 return $quantity;
@@ -390,15 +412,23 @@ class WasteController extends Controller
                 return Carbon::createFromFormat('Y-m-d', $waste->request_date)->format('d/m/Y');
             })
             ->addColumn('action', function (Waste $waste) {
-                $url_show_waste = "http://frontend.local/waste/show/".$waste->id;
+
                 $url_show_transfer = "http://frontend.local/waste/user/show-transfer/".$waste->transfer_id;
+                $url_show_transfer_pdf = "http://frontend.local/waste/user/show-transfer/pdf/".$waste->transfer_id;
+
                 $links = '';
-                $links .= '<a href="'.$url_show_waste.'" class="btn btn-success"></i>Ver residuo</a>';
-                $links .= '<a href="'.$url_show_transfer.'" class="btn btn-success"></i>Ver Cesión</a>';
+
+                if($waste->status_id == 1){
+                    $links .= '<a class="btn btn-success accept-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'"><i class="fa fa-check" aria-hidden="true"></i></a>';
+                    $links .= '<a class="btn btn-danger decline-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'"><i class="fa fa-close" aria-hidden="true"></i></a>';
+                }
+
+                $links .= '<a target="_blank" href="'.$url_show_transfer.'" class="btn btn-info m-1"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+                $links .= '<a href="'.$url_show_transfer_pdf.'" class="btn btn-purple m-1"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>';
 
                 return $links;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'status', 'name', 'request_name'])
             ->toJson();
     }
 
@@ -413,6 +443,28 @@ class WasteController extends Controller
         $waste = $this->wasteRepo->userRequestsData($user, $f_name, $f_waste_type, $f_cer_code, $f_pickup_date, $f_creator_name, $f_request_date);
         return datatables()
             ->of($waste)
+            ->editColumn('name', function (Waste $waste) {
+                $name = '<a href="http://frontend.local/waste/show/'.$waste->id.'" target="_blank">'.$waste->name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+                return $name;
+            })
+            ->editColumn('creator_name', function (Waste $waste) {
+                $link = '<a href="http://frontend.local/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+
+                return $link;
+            })
+            ->editColumn('status', function (Waste $waste) {
+                $type = '';
+                if ($waste->status_id == 1)
+                    $type .= '<span class="badge badge-yellow">'.$waste->status.'</span>';
+                elseif($waste->status_id == 2)
+                    $type .= '<span class="badge badge-danger text-white">'.$waste->status.'</span>';
+                elseif($waste->status_id == 3)
+                    $type .= '<span class="badge badge-danger text-white">'.$waste->status.'</span>';
+                elseif($waste->status_id == 4)
+                    $type .= '<span class="badge badge-primary text-white">'.$waste->status.'</span>';
+
+                return $type;
+            })
             ->editColumn('quantity', function (Waste $waste) {
                 $quantity = $waste->quantity . " " . $waste->measured_unit;
                 return $quantity;
@@ -424,15 +476,21 @@ class WasteController extends Controller
                 return Carbon::createFromFormat('Y-m-d', $waste->request_date)->format('d/m/Y');
             })
             ->addColumn('action', function (Waste $waste) {
-                $url_show = "http://frontend.local/waste/show/".$waste->id;
-                $url_show_request = "http://frontend.local/waste/user/show-request/".$waste->transfer_id;
+                $url_show_transfer = "http://frontend.local/waste/user/show-transfer/".$waste->transfer_id;
+                $url_show_transfer_pdf = "http://frontend.local/waste/user/show-transfer/pdf/".$waste->transfer_id;
+
                 $links = '';
-                $links .= '<a href="'.$url_show.'" class="btn btn-success" ></i>Ver residuo</a>';
-                $links .= '<a href="'.$url_show_request.'" class="btn btn-success" ></i>Ver solicitud</a>';
+
+                if($waste->status_id == 1){
+                    $links .= '<a class="btn btn-danger cancel-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'" data-provide="tooltip" data-placement="top" data-original-title="Cancelar solicitud"><i class="fa fa-close" aria-hidden="true"></i></a>';
+                }
+
+                $links .= '<a target="_blank" href="'.$url_show_transfer.'" class="btn btn-info m-1" data-provide="tooltip" data-placement="top" title="" data-original-title="Ver solicitud"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+                $links .= '<a href="'.$url_show_transfer_pdf.'" class="btn btn-purple m-1" data-provide="tooltip" data-placement="top" title="" data-original-title="Descargar solicitud"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>';
 
                 return $links;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'name', 'creator_name', 'status'])
             ->toJson();
     }
 
@@ -487,6 +545,7 @@ class WasteController extends Controller
             ], 200);
 
         }catch (\Exception $exception){
+            Log::error('SOLICITUD DE RESIDUO: '. $exception->getMessage());
             DB::rollBack();
             return response()->json(['exception' => $exception, 'message' => "Se ha producido un error al tramitar la solicitud."], 500);
         }

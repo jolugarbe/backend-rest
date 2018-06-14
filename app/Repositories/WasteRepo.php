@@ -212,6 +212,7 @@ class WasteRepo extends BaseRepo
         $query = $this->getModel()
             ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
             ->join('transfers', 'transfers.waste_id', '=', 'waste.id')
+            ->join('status_transfers', 'status_transfers.id', '=', 'transfers.status_id')
             ->join('users', 'users.id', '=', 'transfers.applicant_user_id')
             ->where('transfers.owner_user_id', '=', $user->getId());
 
@@ -235,7 +236,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('transfers.transfer_date', '=', Carbon::createFromFormat('d/m/Y', $f_request_date)->format('Y-m-d'));
         // End Filters
 
-        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as request_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id');
+        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as request_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id', 'status_transfers.display_name as status', 'transfers.status_id', 'waste.owner_user_id');
 
         return $query;
     }
@@ -245,6 +246,7 @@ class WasteRepo extends BaseRepo
         $query = $this->getModel()
             ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
             ->join('transfers', 'transfers.waste_id', '=', 'waste.id')
+            ->join('status_transfers', 'status_transfers.id', '=', 'transfers.status_id')
             ->join('users', 'users.id', '=', 'transfers.owner_user_id')
             ->where('transfers.applicant_user_id', '=', $user->getId());
 
@@ -268,7 +270,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('transfers.transfer_date', '=', Carbon::createFromFormat('d/m/Y', $f_request_date)->format('Y-m-d'));
         // End Filters
 
-        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as creator_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id');
+        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as creator_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id', 'status_transfers.display_name as status', 'transfers.status_id', 'waste.creator_user_id');
 
         return $query;
     }

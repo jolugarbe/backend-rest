@@ -52,4 +52,10 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('delete', 'Api\WasteController@delete');
         Route::post('user/show-transfer-request', 'Api\WasteController@showTransferRequest');
     });
+
+    Route::prefix('transfer')->group(function () {
+        Route::post('accept', 'Api\TransferController@acceptTransfer');
+        Route::post('decline', 'Api\TransferController@declineTransfer');
+        Route::post('cancel', 'Api\TransferController@cancelTransfer');
+    });
 });
