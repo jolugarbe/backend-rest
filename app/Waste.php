@@ -184,4 +184,12 @@ class Waste extends Model
     public function getTransfer(){
         return $this->hasOne('App\Transfer', 'waste_id', 'id');
     }
+
+    public function getDemandAcquired(){
+        return $this->acquired;
+    }
+
+    public function setDemandAcquired($value){
+        $this->acquired = $value;
+    }
 }

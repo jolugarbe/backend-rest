@@ -51,6 +51,8 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('show', 'Api\WasteController@show');
         Route::post('delete', 'Api\WasteController@delete');
         Route::post('user/show-transfer-request', 'Api\WasteController@showTransferRequest');
+        Route::post('demand/proposal', 'Api\WasteController@proposeDemandWaste');
+        Route::post('demand/acquired', 'Api\WasteController@acquiredDemandWaste');
     });
 
     Route::prefix('transfer')->group(function () {

@@ -36,6 +36,7 @@ class CreateWasteTable extends Migration
             $table->integer('creator_user_id')->unsigned()->nullable();
             $table->integer('owner_user_id')->unsigned()->nullable()->default(null);
             $table->boolean('available')->default(1);
+            $table->boolean('acquired')->nullable();
             $table->timestamps();
 
             $table->index(['id']);

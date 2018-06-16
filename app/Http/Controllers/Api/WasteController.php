@@ -260,8 +260,16 @@ class WasteController extends Controller
                 $type = '';
                 if ($waste->t_ad_id == 1)
                     $type .= '<span class="badge badge-primary">Oferta</span>';
-                else
-                    $type .= '<span class="badge badge-purple text-white">Demanda</span>';
+                else{
+                    $type .= '<span class="badge badge-purple text-white">Demanda</span> -> ';
+
+                    if($waste->acquired){
+                        $type .= '<span class="badge badge-success text-white">Conseguido</span>';
+                    }else{
+                        $type .= '<span class="badge badge-yellow text-white">Pendiente</span>';
+                    }
+                }
+
 
                 return $type;
             })
@@ -282,8 +290,15 @@ class WasteController extends Controller
                 $url_update = "http://frontend.local/waste/update/".$waste->id;
                 $url_delete = "http://frontend.local/waste/delete/".$waste->id;
                 $links = '';
-                $links .= '<a href="'.$url_update.'" class="btn btn-square btn-success" ><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>';
-                $links .= '<a href="'.$url_delete.'" id="'.$waste->id.'" data-waste_id="'.$waste->id.'" class="delete-waste btn btn-square btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>';
+
+                if($waste->t_ad_id == 2 && !$waste->acquired){
+                    $links .= '<a data-waste_id="'.$waste->id.'" class="acquired-waste btn btn-square btn-success text-white m-1" data-toggle="tooltip" data-placement="top" title="Marcar como conseguido"><i class="fa fa-check" aria-hidden="true"></i></a>';
+                }
+
+                if(!$waste->acquired)
+                $links .= '<a href="'.$url_update.'" class="btn btn-square btn-info m-1" data-toggle="tooltip" data-placement="top" title="Editar publicación"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>';
+
+                $links .= '<a href="'.$url_delete.'" id="'.$waste->id.'" data-waste_id="'.$waste->id.'" class="delete-waste btn btn-square btn-danger m-1"  data-toggle="tooltip" data-placement="top" title="Eliminar publicación"><i class="fa fa-trash" aria-hidden="true"></i></a>';
 
                 return $links;
             })
@@ -307,6 +322,10 @@ class WasteController extends Controller
                 $quantity = $waste->quantity . " " . $waste->measured_unit;
                 return $quantity;
             })
+            ->editColumn('creator_name', function (Waste $waste) {
+                $link = '<a href="http://frontend.local/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+                return $link;
+            })
             ->editColumn('pickup_date', function (Waste $waste) {
                 return Carbon::createFromFormat('Y-m-d', $waste->pickup_date)->format('d/m/Y');
             })
@@ -318,12 +337,14 @@ class WasteController extends Controller
             })
             ->addColumn('action', function (Waste $waste) {
                 $url_demand = "http://frontend.local/waste/demand/".$waste->id;
+                $url_show_waste = "http://frontend.local/waste/show/".$waste->id;
                 $links = '';
-                $links .= '<a class="btn btn-success request-waste" data-waste_id="'.$waste->id.'" ></i>Solicitar</a>';
+                $links .= '<a target="_blank" href="'.$url_show_waste.'" class="btn btn-info m-1" data-toggle="tooltip" data-placement="top" title="Ver residuo"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+                $links .= '<a class="btn btn-success request-waste text-white" data-waste_id="'.$waste->id.'" data-toggle="tooltip" data-placement="top" title="Solicitar residuo"><i class="fa fa-hand-paper-o" aria-hidden="true"></i></a>';
 
                 return $links;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'creator_name'])
             ->toJson();
     }
 
@@ -345,6 +366,10 @@ class WasteController extends Controller
                 $quantity = $waste->quantity . " " . $waste->measured_unit;
                 return $quantity;
             })
+            ->editColumn('creator_name', function (Waste $waste) {
+                $link = '<a href="http://frontend.local/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+                return $link;
+            })
 //            ->editColumn('pickup_date', function (Waste $waste) {
 //                return Carbon::createFromFormat('Y-m-d', $waste->pickup_date)->format('d/m/Y');
 //            })
@@ -359,12 +384,14 @@ class WasteController extends Controller
             })
             ->addColumn('action', function (Waste $waste) {
                 $url_demand = "http://frontend.local/waste/demand/".$waste->id;
+                $url_show_waste = "http://frontend.local/waste/show/".$waste->id;
                 $links = '';
-                $links .= '<a class="btn btn-success request-waste" data-waste_id="'.$waste->id.'" ></i>Solicitar</a>';
+                $links .= '<a target="_blank" href="'.$url_show_waste.'" class="btn btn-info m-1" data-toggle="tooltip" data-placement="top" title="Ver residuo"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+                $links .= '<a class="btn btn-success contact-waste text-white" data-receiver_id="'.$waste->creator_user_id.'" data-waste_name="'.$waste->name.'" data-waste_id="'.$waste->id.'" data-toggle="tooltip" data-placement="top" title="Contactar con demandante"><i class="fa fa-envelope" aria-hidden="true"></i></a>';
 
                 return $links;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'creator_name'])
             ->toJson();
     }
 
@@ -391,13 +418,13 @@ class WasteController extends Controller
             ->editColumn('status', function (Waste $waste) {
                 $type = '';
                 if ($waste->status_id == 1)
-                    $type .= '<span class="badge badge-yellow">'.$waste->status.'</span>';
+                    $type .= '<span class="badge badge-yellow" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
                 elseif($waste->status_id == 2)
-                    $type .= '<span class="badge badge-danger text-white">'.$waste->status.'</span>';
+                    $type .= '<span class="badge badge-danger text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
                 elseif($waste->status_id == 3)
-                    $type .= '<span class="badge badge-danger text-white">'.$waste->status.'</span>';
+                    $type .= '<span class="badge badge-danger text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
                 elseif($waste->status_id == 4)
-                    $type .= '<span class="badge badge-primary text-white">'.$waste->status.'</span>';
+                    $type .= '<span class="badge badge-primary text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
 
                 return $type;
             })
@@ -419,12 +446,12 @@ class WasteController extends Controller
                 $links = '';
 
                 if($waste->status_id == 1){
-                    $links .= '<a class="btn btn-success accept-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'"><i class="fa fa-check" aria-hidden="true"></i></a>';
-                    $links .= '<a class="btn btn-danger decline-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'"><i class="fa fa-close" aria-hidden="true"></i></a>';
+                    $links .= '<a class="btn btn-success accept-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'" data-toggle="tooltip" data-placement="top" title="Aceptar solicitud"><i class="fa fa-check" aria-hidden="true"></i></a>';
+                    $links .= '<a class="btn btn-danger decline-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'" data-toggle="tooltip" data-placement="top" title="Rechazar solicitud"><i class="fa fa-close" aria-hidden="true"></i></a>';
                 }
 
-                $links .= '<a target="_blank" href="'.$url_show_transfer.'" class="btn btn-info m-1"><i class="fa fa-eye" aria-hidden="true"></i></a>';
-                $links .= '<a href="'.$url_show_transfer_pdf.'" class="btn btn-purple m-1"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>';
+                $links .= '<a target="_blank" href="'.$url_show_transfer.'" class="btn btn-info m-1" data-toggle="tooltip" data-placement="top" title="Ver solicitud"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+                $links .= '<a href="'.$url_show_transfer_pdf.'" class="btn btn-purple m-1" data-toggle="tooltip" data-placement="top" title="Descargar solicitud"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>';
 
                 return $links;
             })
@@ -455,13 +482,13 @@ class WasteController extends Controller
             ->editColumn('status', function (Waste $waste) {
                 $type = '';
                 if ($waste->status_id == 1)
-                    $type .= '<span class="badge badge-yellow">'.$waste->status.'</span>';
+                    $type .= '<span class="badge badge-yellow" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
                 elseif($waste->status_id == 2)
-                    $type .= '<span class="badge badge-danger text-white">'.$waste->status.'</span>';
+                    $type .= '<span class="badge badge-danger text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
                 elseif($waste->status_id == 3)
-                    $type .= '<span class="badge badge-danger text-white">'.$waste->status.'</span>';
+                    $type .= '<span class="badge badge-danger text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
                 elseif($waste->status_id == 4)
-                    $type .= '<span class="badge badge-primary text-white">'.$waste->status.'</span>';
+                    $type .= '<span class="badge badge-primary text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
 
                 return $type;
             })
@@ -482,11 +509,11 @@ class WasteController extends Controller
                 $links = '';
 
                 if($waste->status_id == 1){
-                    $links .= '<a class="btn btn-danger cancel-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'" data-provide="tooltip" data-placement="top" data-original-title="Cancelar solicitud"><i class="fa fa-close" aria-hidden="true"></i></a>';
+                    $links .= '<a class="btn btn-danger cancel-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'" data-toggle="tooltip" data-placement="top" title="Cancelar solicitud"><i class="fa fa-close" aria-hidden="true"></i></a>';
                 }
 
-                $links .= '<a target="_blank" href="'.$url_show_transfer.'" class="btn btn-info m-1" data-provide="tooltip" data-placement="top" title="" data-original-title="Ver solicitud"><i class="fa fa-eye" aria-hidden="true"></i></a>';
-                $links .= '<a href="'.$url_show_transfer_pdf.'" class="btn btn-purple m-1" data-provide="tooltip" data-placement="top" title="" data-original-title="Descargar solicitud"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>';
+                $links .= '<a target="_blank" href="'.$url_show_transfer.'" class="btn btn-info m-1" data-toggle="tooltip" data-placement="top" title="Ver solicitud"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+                $links .= '<a href="'.$url_show_transfer_pdf.'" class="btn btn-purple m-1" data-toggle="tooltip" data-placement="top" title="Descargar solicitud"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>';
 
                 return $links;
             })
@@ -640,6 +667,59 @@ class WasteController extends Controller
 
         }catch (\Exception $exception){
             return response()->json(['exception' => $exception->getMessage()], 500);
+        }
+    }
+
+    public function proposeDemandWaste(Request $request){
+        $input = $request->all();
+
+        try{
+            $user = Auth::user();
+            $waste = $this->wasteRepo->findOrFail($input['waste_id']);
+            $creator = $waste->getCreator;
+            $proposal = $input['proposal'];
+
+            // Send to the waste user creator
+            $contenido = \View::make('emails.proposal-waste', compact('waste', 'user', 'creator', 'proposal'))->render();
+            $datos=[
+                $creator->getEmail(),
+                $creator->getEmail(),
+                $user->getEmail(),
+                $user->getEmail(),
+                'Propuesta sobre residuo demandado',
+                $contenido,
+                null,
+                null];
+
+            $mail=new EnviarMail($datos);
+            $this->dispatch($mail);
+
+            return response()->json([
+                'message' => "Propuesta enviada correctamente."
+            ], 200);
+
+        }catch (\Exception $exception){
+            Log::error('PROPUESTA SOBRE RESIDUO: '. $exception->getMessage());
+            return response()->json(['exception' => $exception, 'message' => "Se ha producido un error al enviar la propuesta."], 500);
+        }
+    }
+
+    public function acquiredDemandWaste(Request $request){
+        $input = $request->all();
+        DB::beginTransaction();
+        try{
+            $user = Auth::user();
+            $waste = $this->wasteRepo->findOrFail($input['waste_id']);
+            $waste->setDemandAcquired(1);
+            $waste->save();
+
+            DB::commit();
+            return response()->json([
+                'message' => "Residuo marcado como conseguido correctamente."
+            ], 200);
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return response()->json(['exception' => $exception, 'message' => "Se ha producido un error al marcar el residuo como conseguido."], 500);
         }
     }
 }
