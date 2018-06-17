@@ -539,8 +539,8 @@ class WasteController extends Controller
             $is_owner = true;
             $contenido = \View::make('emails.waste-transfer-request', compact('waste', 'is_owner'))->render();
             $datos=[
-                $owner->getEmail(),
-                $owner->getEmail(),
+                $owner->getNotificationData->getEmail(),
+                $owner->getNotificationData->getEmail(),
                 'admin@bolsacafa.com',
                 'Admin',
                 'Solicitud de cesión de residuo recibida',
@@ -555,8 +555,8 @@ class WasteController extends Controller
             $is_owner = false;
             $contenido = \View::make('emails.waste-transfer-request', compact('waste', 'is_owner'))->render();
             $datos=[
-                $user->getEmail(),
-                $user->getEmail(),
+                $user->getNotificationData->getEmail(),
+                $user->getNotificationData->getEmail(),
                 'admin@bolsacafa.com',
                 'Admin',
                 'Solicitud de cesión de residuo enviada',
@@ -657,10 +657,12 @@ class WasteController extends Controller
             $request_locality = $request_address->getLocality->getName();
             $request_province = $request_address->getLocality->getProvince->getName();
 
+            $status_transfer_id = $transfer->getStatus->getId();
+            $status_transfer_name = $transfer->getStatus->getDisplayName();
 
             if($transfer['owner_user_id'] == $user->getId() || $transfer['applicant_user_id'] == $user->getId())
             {
-                return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province, 'owner_user' => $owner_user, 'owner_activity' => $owner_activity, 'owner_address' => $owner_address, 'owner_locality' => $owner_locality, 'owner_province' => $owner_province, 'request_user' => $request_user, 'request_activity' => $request_activity, 'request_address' => $request_address, 'request_locality' => $request_locality, 'request_province' => $request_province], 200);
+                return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province, 'owner_user' => $owner_user, 'owner_activity' => $owner_activity, 'owner_address' => $owner_address, 'owner_locality' => $owner_locality, 'owner_province' => $owner_province, 'request_user' => $request_user, 'request_activity' => $request_activity, 'request_address' => $request_address, 'request_locality' => $request_locality, 'request_province' => $request_province, 'status_transfer_id' => $status_transfer_id, 'status_transfer_name' => $status_transfer_name], 200);
             }else {
                 return response()->json(['exception' => 'No tienes permiso para ver esta operación.'], 403);
             }
@@ -682,10 +684,10 @@ class WasteController extends Controller
             // Send to the waste user creator
             $contenido = \View::make('emails.proposal-waste', compact('waste', 'user', 'creator', 'proposal'))->render();
             $datos=[
-                $creator->getEmail(),
-                $creator->getEmail(),
-                $user->getEmail(),
-                $user->getEmail(),
+                $creator->getNotificationData->getEmail(),
+                $creator->getNotificationData->getEmail(),
+                $user->getNotificationData->getEmail(),
+                $user->getNotificationData->getEmail(),
                 'Propuesta sobre residuo demandado',
                 $contenido,
                 null,

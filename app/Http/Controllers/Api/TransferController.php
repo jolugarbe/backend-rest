@@ -34,8 +34,8 @@ class TransferController extends Controller
             // Send to the owner of the waste
             $contenido = \View::make('emails.accept-transfer', compact('waste'))->render();
             $datos=[
-                $waste->getOwner->getEmail(),
-                $waste->getOwner->getEmail(),
+                $waste->getOwner->getNotificationData->getEmail(),
+                $waste->getOwner->getNotificationData->getEmail(),
                 'admin@bolsacafa.com',
                 'Admin',
                 'Solicitud aceptada',
@@ -73,8 +73,8 @@ class TransferController extends Controller
             // Send to the owner of the waste
             $contenido = \View::make('emails.decline-transfer', compact('waste'))->render();
             $datos=[
-                $waste->getOwner->getEmail(),
-                $waste->getOwner->getEmail(),
+                $waste->getOwner->getNotificationData->getEmail(),
+                $waste->getOwner->getNotificationData->getEmail(),
                 'admin@bolsacafa.com',
                 'Admin',
                 'Solicitud rechazada',
@@ -112,8 +112,8 @@ class TransferController extends Controller
             // Send to the owner of the waste
             $contenido = \View::make('emails.cancel-transfer', compact('waste'))->render();
             $datos=[
-                $waste->getCreator->getEmail(),
-                $waste->getCreator->getEmail(),
+                $waste->getCreator->getNotificationData->getEmail(),
+                $waste->getCreator->getNotificationData->getEmail(),
                 'admin@bolsacafa.com',
                 'Admin',
                 'Solicitud cancelada',
