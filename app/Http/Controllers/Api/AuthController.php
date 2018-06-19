@@ -135,6 +135,7 @@ class AuthController extends Controller
             return response()->json([
                 'token' => $token,
                 'user' => $user,
+                'role_admin' => $user->hasRole('admin')
             ], 200);
         } else {
             return response()->json(['error' => 'Las credenciales introducidas no están autorizadas o son incorrectas.'], 401);

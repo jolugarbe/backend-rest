@@ -60,4 +60,10 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('decline', 'Api\TransferController@declineTransfer');
         Route::post('cancel', 'Api\TransferController@cancelTransfer');
     });
+
+
+    // ADMIN
+    Route::prefix('admin')->group(function () {
+        Route::post('dashboard-data', 'Api\AdminController@dashboardData');
+    });
 });
