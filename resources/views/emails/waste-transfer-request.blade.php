@@ -146,7 +146,7 @@
                                 <td bgcolor="#ffffff" align="center" style="padding: 20px 30px 60px 30px;">
                                     <table border="0" cellspacing="0" cellpadding="0">
                                         <tbody><tr>
-                                            <td align="center" style="border-radius: 3px;" bgcolor="#33cabb"><a @if($is_owner) href="http://frontend.local/waste/user/transfers" @else href="http://frontend.local/waste/user/requests" @endif target="_blank" style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 12px 50px; border-radius: 2px; border: 1px solid #33cabb; display: inline-block;">Acceder</a></td>
+                                            <td align="center" style="border-radius: 3px;" bgcolor="#33cabb"><a @if($is_owner) href="http://cafa.nelium.net/waste/user/transfers" @else href="http://cafa.nelium.net/waste/user/requests" @endif target="_blank" style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 12px 50px; border-radius: 2px; border: 1px solid #33cabb; display: inline-block;">Acceder</a></td>
                                         </tr>
                                         </tbody></table>
                                 </td>

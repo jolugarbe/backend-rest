@@ -287,8 +287,8 @@ class WasteController extends Controller
                 return Carbon::createFromFormat('Y-m-d', $waste->generation_date)->format('d/m/Y');
             })
             ->addColumn('action', function (Waste $waste) {
-                $url_update = "http://frontend.local/waste/update/".$waste->id;
-                $url_delete = "http://frontend.local/waste/delete/".$waste->id;
+                $url_update = "http://cafa.nelium.net/waste/update/".$waste->id;
+                $url_delete = "http://cafa.nelium.net/waste/delete/".$waste->id;
                 $links = '';
 
                 if($waste->t_ad_id == 2 && !$waste->acquired){
@@ -323,7 +323,7 @@ class WasteController extends Controller
                 return $quantity;
             })
             ->editColumn('creator_name', function (Waste $waste) {
-                $link = '<a href="http://frontend.local/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+                $link = '<a href="http://cafa.nelium.net/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
                 return $link;
             })
             ->editColumn('pickup_date', function (Waste $waste) {
@@ -336,8 +336,8 @@ class WasteController extends Controller
                 return $waste->dangerous == 1 ? "SÍ" : "NO";
             })
             ->addColumn('action', function (Waste $waste) {
-                $url_demand = "http://frontend.local/waste/demand/".$waste->id;
-                $url_show_waste = "http://frontend.local/waste/show/".$waste->id;
+                $url_demand = "http://cafa.nelium.net/waste/demand/".$waste->id;
+                $url_show_waste = "http://cafa.nelium.net/waste/show/".$waste->id;
                 $links = '';
                 $links .= '<a target="_blank" href="'.$url_show_waste.'" class="btn btn-info m-1" data-toggle="tooltip" data-placement="top" title="Ver residuo"><i class="fa fa-eye" aria-hidden="true"></i></a>';
                 $links .= '<a class="btn btn-success request-waste text-white" data-waste_id="'.$waste->id.'" data-toggle="tooltip" data-placement="top" title="Solicitar residuo"><i class="fa fa-hand-paper-o" aria-hidden="true"></i></a>';
@@ -367,7 +367,7 @@ class WasteController extends Controller
                 return $quantity;
             })
             ->editColumn('creator_name', function (Waste $waste) {
-                $link = '<a href="http://frontend.local/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+                $link = '<a href="http://cafa.nelium.net/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
                 return $link;
             })
 //            ->editColumn('pickup_date', function (Waste $waste) {
@@ -383,8 +383,8 @@ class WasteController extends Controller
                 return $waste->dangerous == 1 ? "SÍ" : "NO";
             })
             ->addColumn('action', function (Waste $waste) {
-                $url_demand = "http://frontend.local/waste/demand/".$waste->id;
-                $url_show_waste = "http://frontend.local/waste/show/".$waste->id;
+                $url_demand = "http://cafa.nelium.net/waste/demand/".$waste->id;
+                $url_show_waste = "http://cafa.nelium.net/waste/show/".$waste->id;
                 $links = '';
                 $links .= '<a target="_blank" href="'.$url_show_waste.'" class="btn btn-info m-1" data-toggle="tooltip" data-placement="top" title="Ver residuo"><i class="fa fa-eye" aria-hidden="true"></i></a>';
                 $links .= '<a class="btn btn-success contact-waste text-white" data-receiver_id="'.$waste->creator_user_id.'" data-waste_name="'.$waste->name.'" data-waste_id="'.$waste->id.'" data-toggle="tooltip" data-placement="top" title="Contactar con demandante"><i class="fa fa-envelope" aria-hidden="true"></i></a>';
@@ -407,11 +407,11 @@ class WasteController extends Controller
         return datatables()
             ->of($waste)
             ->editColumn('name', function (Waste $waste) {
-                $name = '<a href="http://frontend.local/waste/show/'.$waste->id.'" target="_blank">'.$waste->name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+                $name = '<a href="http://cafa.nelium.net/waste/show/'.$waste->id.'" target="_blank">'.$waste->name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
                 return $name;
             })
             ->editColumn('request_name', function (Waste $waste) {
-                $link = '<a href="http://frontend.local/user/show/'.$waste->owner_user_id.'" target="_blank">'.$waste->request_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+                $link = '<a href="http://cafa.nelium.net/user/show/'.$waste->owner_user_id.'" target="_blank">'.$waste->request_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
 
                 return $link;
             })
@@ -440,8 +440,8 @@ class WasteController extends Controller
             })
             ->addColumn('action', function (Waste $waste) {
 
-                $url_show_transfer = "http://frontend.local/waste/user/show-transfer/".$waste->transfer_id;
-                $url_show_transfer_pdf = "http://frontend.local/waste/user/show-transfer/pdf/".$waste->transfer_id;
+                $url_show_transfer = "http://cafa.nelium.net/waste/user/show-transfer/".$waste->transfer_id;
+                $url_show_transfer_pdf = "http://cafa.nelium.net/waste/user/show-transfer/pdf/".$waste->transfer_id;
 
                 $links = '';
 
@@ -471,11 +471,11 @@ class WasteController extends Controller
         return datatables()
             ->of($waste)
             ->editColumn('name', function (Waste $waste) {
-                $name = '<a href="http://frontend.local/waste/show/'.$waste->id.'" target="_blank">'.$waste->name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+                $name = '<a href="http://cafa.nelium.net/waste/show/'.$waste->id.'" target="_blank">'.$waste->name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
                 return $name;
             })
             ->editColumn('creator_name', function (Waste $waste) {
-                $link = '<a href="http://frontend.local/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
+                $link = '<a href="http://cafa.nelium.net/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
 
                 return $link;
             })
@@ -503,8 +503,8 @@ class WasteController extends Controller
                 return Carbon::createFromFormat('Y-m-d', $waste->request_date)->format('d/m/Y');
             })
             ->addColumn('action', function (Waste $waste) {
-                $url_show_transfer = "http://frontend.local/waste/user/show-transfer/".$waste->transfer_id;
-                $url_show_transfer_pdf = "http://frontend.local/waste/user/show-transfer/pdf/".$waste->transfer_id;
+                $url_show_transfer = "http://cafa.nelium.net/waste/user/show-transfer/".$waste->transfer_id;
+                $url_show_transfer_pdf = "http://cafa.nelium.net/waste/user/show-transfer/pdf/".$waste->transfer_id;
 
                 $links = '';
 

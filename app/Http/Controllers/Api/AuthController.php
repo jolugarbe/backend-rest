@@ -98,8 +98,8 @@ class AuthController extends Controller
             $datos=[
                 $email,
                 $email,
-                'contacto@bolsaderesiduos.com',
-                'Contacto',
+                'info@cafa.nelium.net',
+                'CAFA',
                 'CAFA | Datos de Acceso a la Bolsa de Residuos Reutilizables y Reciclables',
                 $contenido,
                 null,
@@ -168,8 +168,8 @@ class AuthController extends Controller
                 $datos=[
                     $email,
                     $email,
-                    'from@example.com',
-                    'Example',
+                    'info@cafa.nelium.net',
+                    'CAFA',
                     'Restaurar contraseña',
                     $contenido,
                     null,

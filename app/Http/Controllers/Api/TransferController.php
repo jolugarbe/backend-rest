@@ -36,8 +36,8 @@ class TransferController extends Controller
             $datos=[
                 $waste->getOwner->getNotificationData->getEmail(),
                 $waste->getOwner->getNotificationData->getEmail(),
-                'admin@bolsacafa.com',
-                'Admin',
+                'info@cafa.nelium.net',
+                'CAFA',
                 'Solicitud aceptada',
                 $contenido,
                 null,
@@ -75,8 +75,8 @@ class TransferController extends Controller
             $datos=[
                 $waste->getOwner->getNotificationData->getEmail(),
                 $waste->getOwner->getNotificationData->getEmail(),
-                'admin@bolsacafa.com',
-                'Admin',
+                'info@cafa.nelium.net',
+                'CAFA',
                 'Solicitud rechazada',
                 $contenido,
                 null,
@@ -114,8 +114,8 @@ class TransferController extends Controller
             $datos=[
                 $waste->getCreator->getNotificationData->getEmail(),
                 $waste->getCreator->getNotificationData->getEmail(),
-                'admin@bolsacafa.com',
-                'Admin',
+                'info@cafa.nelium.net',
+                'CAFA',
                 'Solicitud cancelada',
                 $contenido,
                 null,
