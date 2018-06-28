@@ -124,7 +124,7 @@ class WasteRepo extends BaseRepo
         // End Filters
 
         $query = $query->select('waste.id', 'waste.quantity', 'waste.composition','waste.measured_unit', 'waste.name', 'waste.t_ad_id', 'waste.cer_code', 'waste.generation_date', 'waste.dangerous', 'waste_type.name as type', 'waste.acquired');
-        return $query;
+        return $query->get();
     }
 
     public function availableData($user, $f_name = null, $f_waste_type = null, $f_cer_code = null, $f_pickup_date = null, $f_creator_name = null, $f_generation_date = null, $f_dangerous = null)
@@ -161,7 +161,7 @@ class WasteRepo extends BaseRepo
 
         $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as creator_name', 'waste.generation_date as generation_date', 'waste_type.name as type', 'waste.dangerous', 'waste.creator_user_id');
 
-        return $query;
+        return $query->get();
     }
 
     public function demandData($user, $f_name = null, $f_waste_type = null, $f_cer_code = null, $f_pickup_date = null, $f_creator_name = null, $f_generation_date = null, $f_dangerous = null, $f_publication_date_1 = null, $f_publication_date_2 = null)
@@ -204,7 +204,7 @@ class WasteRepo extends BaseRepo
 
         $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as creator_name', 'waste.generation_date as generation_date', 'waste_type.name as type', 'waste.dangerous', 'waste.created_at as publication_date', 'waste.creator_user_id');
 
-        return $query;
+        return $query->get();
     }
 
     public function userTransfersData($user, $f_name = null, $f_waste_type = null, $f_cer_code = null, $f_pickup_date = null, $f_request_name = null, $f_request_date = null)
@@ -238,7 +238,7 @@ class WasteRepo extends BaseRepo
 
         $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as request_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id', 'status_transfers.display_name as status', 'transfers.status_id', 'waste.owner_user_id', 'transfers.updated_at');
 
-        return $query;
+        return $query->get();
     }
 
     public function userRequestsData($user, $f_name = null, $f_waste_type = null, $f_cer_code = null, $f_pickup_date = null, $f_creator_name = null, $f_request_date = null)
@@ -272,7 +272,7 @@ class WasteRepo extends BaseRepo
 
         $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as creator_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id', 'status_transfers.display_name as status', 'transfers.status_id', 'waste.creator_user_id', 'transfers.updated_at');
 
-        return $query;
+        return $query->get();
     }
 
 }

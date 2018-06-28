@@ -254,56 +254,7 @@ class WasteController extends Controller
         $f_ad_type = $request->input('f_ad_type');
         $waste = $this->wasteRepo->userOffersData($user, $f_name, $f_waste_type, $f_cer_code, $f_generation_date, $f_dangerous, $f_ad_type);
 
-        return datatables()
-            ->of($waste)
-            ->editColumn('t_ad_id', function (Waste $waste) {
-                $type = '';
-                if ($waste->t_ad_id == 1)
-                    $type .= '<span class="badge badge-primary">Oferta</span>';
-                else{
-                    $type .= '<span class="badge badge-purple text-white">Demanda</span> -> ';
-
-                    if($waste->acquired){
-                        $type .= '<span class="badge badge-success text-white">Conseguido</span>';
-                    }else{
-                        $type .= '<span class="badge badge-yellow text-white">Pendiente</span>';
-                    }
-                }
-
-
-                return $type;
-            })
-            ->editColumn('dangerous', function (Waste $waste) {
-                if ($waste->dangerous == 1)
-                    return "SÍ";
-                else
-                   return "NO";
-            })
-            ->editColumn('quantity', function (Waste $waste) {
-                $quantity = $waste->quantity . " " . $waste->measured_unit;
-                return $quantity;
-            })
-            ->editColumn('generation_date', function (Waste $waste) {
-                return Carbon::createFromFormat('Y-m-d', $waste->generation_date)->format('d/m/Y');
-            })
-            ->addColumn('action', function (Waste $waste) {
-                $url_update = "http://cafa.nelium.net/waste/update/".$waste->id;
-                $url_delete = "http://cafa.nelium.net/waste/delete/".$waste->id;
-                $links = '';
-
-                if($waste->t_ad_id == 2 && !$waste->acquired){
-                    $links .= '<a data-waste_id="'.$waste->id.'" class="acquired-waste btn btn-square btn-success text-white m-1" data-toggle="tooltip" data-placement="top" title="Marcar como conseguido"><i class="fa fa-check" aria-hidden="true"></i></a>';
-                }
-
-                if(!$waste->acquired)
-                $links .= '<a href="'.$url_update.'" class="btn btn-square btn-info m-1" data-toggle="tooltip" data-placement="top" title="Editar publicación"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>';
-
-                $links .= '<a href="'.$url_delete.'" id="'.$waste->id.'" data-waste_id="'.$waste->id.'" class="delete-waste btn btn-square btn-danger m-1"  data-toggle="tooltip" data-placement="top" title="Eliminar publicación"><i class="fa fa-trash" aria-hidden="true"></i></a>';
-
-                return $links;
-            })
-            ->rawColumns(['action', 't_ad_id', 'quantity'])
-            ->toJson();
+        return json_encode($waste);
     }
 
     public function availableListData(Request $request){
@@ -316,36 +267,8 @@ class WasteController extends Controller
         $f_generation_date = $request->input('f_generation_date');
         $f_dangerous = $request->input('f_dangerous');
         $waste = $this->wasteRepo->availableData($user, $f_name, $f_waste_type, $f_cer_code, $f_pickup_date, $f_creator_name, $f_generation_date, $f_dangerous);
-        return datatables()
-            ->of($waste)
-            ->editColumn('quantity', function (Waste $waste) {
-                $quantity = $waste->quantity . " " . $waste->measured_unit;
-                return $quantity;
-            })
-            ->editColumn('creator_name', function (Waste $waste) {
-                $link = '<a href="http://cafa.nelium.net/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
-                return $link;
-            })
-            ->editColumn('pickup_date', function (Waste $waste) {
-                return Carbon::createFromFormat('Y-m-d', $waste->pickup_date)->format('d/m/Y');
-            })
-            ->editColumn('generation_date', function (Waste $waste) {
-                return Carbon::createFromFormat('Y-m-d', $waste->generation_date)->format('d/m/Y');
-            })
-            ->editColumn('dangerous', function (Waste $waste) {
-                return $waste->dangerous == 1 ? "SÍ" : "NO";
-            })
-            ->addColumn('action', function (Waste $waste) {
-                $url_demand = "http://cafa.nelium.net/waste/demand/".$waste->id;
-                $url_show_waste = "http://cafa.nelium.net/waste/show/".$waste->id;
-                $links = '';
-                $links .= '<a target="_blank" href="'.$url_show_waste.'" class="btn btn-info m-1" data-toggle="tooltip" data-placement="top" title="Ver residuo"><i class="fa fa-eye" aria-hidden="true"></i></a>';
-                $links .= '<a class="btn btn-success request-waste text-white" data-waste_id="'.$waste->id.'" data-toggle="tooltip" data-placement="top" title="Solicitar residuo"><i class="fa fa-hand-paper-o" aria-hidden="true"></i></a>';
 
-                return $links;
-            })
-            ->rawColumns(['action', 'creator_name'])
-            ->toJson();
+        return json_encode($waste);
     }
 
     public function demandListData(Request $request){
@@ -360,39 +283,8 @@ class WasteController extends Controller
         $f_publication_date_1 = $request->input('f_publication_date_1');
         $f_publication_date_2 = $request->input('f_publication_date_2');
         $waste = $this->wasteRepo->demandData($user, $f_name, $f_waste_type, $f_cer_code, null, $f_creator_name, null, $f_dangerous, $f_publication_date_1, $f_publication_date_2);
-        return datatables()
-            ->of($waste)
-            ->editColumn('quantity', function (Waste $waste) {
-                $quantity = $waste->quantity . " " . $waste->measured_unit;
-                return $quantity;
-            })
-            ->editColumn('creator_name', function (Waste $waste) {
-                $link = '<a href="http://cafa.nelium.net/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
-                return $link;
-            })
-//            ->editColumn('pickup_date', function (Waste $waste) {
-//                return Carbon::createFromFormat('Y-m-d', $waste->pickup_date)->format('d/m/Y');
-//            })
-//            ->editColumn('generation_date', function (Waste $waste) {
-//                return Carbon::createFromFormat('Y-m-d', $waste->generation_date)->format('d/m/Y');
-//            })
-            ->editColumn('publication_date', function (Waste $waste) {
-                return Carbon::createFromFormat('Y-m-d H:i:s', $waste->publication_date)->format('d/m/Y');
-            })
-            ->editColumn('dangerous', function (Waste $waste) {
-                return $waste->dangerous == 1 ? "SÍ" : "NO";
-            })
-            ->addColumn('action', function (Waste $waste) {
-                $url_demand = "http://cafa.nelium.net/waste/demand/".$waste->id;
-                $url_show_waste = "http://cafa.nelium.net/waste/show/".$waste->id;
-                $links = '';
-                $links .= '<a target="_blank" href="'.$url_show_waste.'" class="btn btn-info m-1" data-toggle="tooltip" data-placement="top" title="Ver residuo"><i class="fa fa-eye" aria-hidden="true"></i></a>';
-                $links .= '<a class="btn btn-success contact-waste text-white" data-receiver_id="'.$waste->creator_user_id.'" data-waste_name="'.$waste->name.'" data-waste_id="'.$waste->id.'" data-toggle="tooltip" data-placement="top" title="Contactar con demandante"><i class="fa fa-envelope" aria-hidden="true"></i></a>';
 
-                return $links;
-            })
-            ->rawColumns(['action', 'creator_name'])
-            ->toJson();
+        return json_encode($waste);
     }
 
     public function userTransfersData(Request $request){
@@ -404,59 +296,9 @@ class WasteController extends Controller
         $f_request_name = $request->input('f_request_name');
         $f_request_date = $request->input('f_request_date');
         $waste = $this->wasteRepo->userTransfersData($user, $f_name, $f_waste_type, $f_cer_code, $f_pickup_date, $f_request_name, $f_request_date);
-        return datatables()
-            ->of($waste)
-            ->editColumn('name', function (Waste $waste) {
-                $name = '<a href="http://cafa.nelium.net/waste/show/'.$waste->id.'" target="_blank">'.$waste->name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
-                return $name;
-            })
-            ->editColumn('request_name', function (Waste $waste) {
-                $link = '<a href="http://cafa.nelium.net/user/show/'.$waste->owner_user_id.'" target="_blank">'.$waste->request_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
 
-                return $link;
-            })
-            ->editColumn('status', function (Waste $waste) {
-                $type = '';
-                if ($waste->status_id == 1)
-                    $type .= '<span class="badge badge-yellow" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
-                elseif($waste->status_id == 2)
-                    $type .= '<span class="badge badge-danger text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
-                elseif($waste->status_id == 3)
-                    $type .= '<span class="badge badge-danger text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
-                elseif($waste->status_id == 4)
-                    $type .= '<span class="badge badge-primary text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
+        return json_encode($waste);
 
-                return $type;
-            })
-            ->editColumn('quantity', function (Waste $waste) {
-                $quantity = $waste->quantity . " " . $waste->measured_unit;
-                return $quantity;
-            })
-            ->editColumn('pickup_date', function (Waste $waste) {
-                return Carbon::createFromFormat('Y-m-d', $waste->pickup_date)->format('d/m/Y');
-            })
-            ->editColumn('request_date', function (Waste $waste) {
-                return Carbon::createFromFormat('Y-m-d', $waste->request_date)->format('d/m/Y');
-            })
-            ->addColumn('action', function (Waste $waste) {
-
-                $url_show_transfer = "http://cafa.nelium.net/waste/user/show-transfer/".$waste->transfer_id;
-                $url_show_transfer_pdf = "http://cafa.nelium.net/waste/user/show-transfer/pdf/".$waste->transfer_id;
-
-                $links = '';
-
-                if($waste->status_id == 1){
-                    $links .= '<a class="btn btn-success accept-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'" data-toggle="tooltip" data-placement="top" title="Aceptar solicitud"><i class="fa fa-check" aria-hidden="true"></i></a>';
-                    $links .= '<a class="btn btn-danger decline-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'" data-toggle="tooltip" data-placement="top" title="Rechazar solicitud"><i class="fa fa-close" aria-hidden="true"></i></a>';
-                }
-
-                $links .= '<a target="_blank" href="'.$url_show_transfer.'" class="btn btn-info m-1" data-toggle="tooltip" data-placement="top" title="Ver solicitud"><i class="fa fa-eye" aria-hidden="true"></i></a>';
-                $links .= '<a href="'.$url_show_transfer_pdf.'" class="btn btn-purple m-1" data-toggle="tooltip" data-placement="top" title="Descargar solicitud"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>';
-
-                return $links;
-            })
-            ->rawColumns(['action', 'status', 'name', 'request_name'])
-            ->toJson();
     }
 
     public function userRequestsData(Request $request){
@@ -468,57 +310,9 @@ class WasteController extends Controller
         $f_creator_name = $request->input('f_creator_name');
         $f_request_date = $request->input('f_request_date');
         $waste = $this->wasteRepo->userRequestsData($user, $f_name, $f_waste_type, $f_cer_code, $f_pickup_date, $f_creator_name, $f_request_date);
-        return datatables()
-            ->of($waste)
-            ->editColumn('name', function (Waste $waste) {
-                $name = '<a href="http://cafa.nelium.net/waste/show/'.$waste->id.'" target="_blank">'.$waste->name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
-                return $name;
-            })
-            ->editColumn('creator_name', function (Waste $waste) {
-                $link = '<a href="http://cafa.nelium.net/user/show/'.$waste->creator_user_id.'" target="_blank">'.$waste->creator_name.'   <i class="fa fa-external-link" aria-hidden="true"></i></a>';
 
-                return $link;
-            })
-            ->editColumn('status', function (Waste $waste) {
-                $type = '';
-                if ($waste->status_id == 1)
-                    $type .= '<span class="badge badge-yellow" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
-                elseif($waste->status_id == 2)
-                    $type .= '<span class="badge badge-danger text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
-                elseif($waste->status_id == 3)
-                    $type .= '<span class="badge badge-danger text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
-                elseif($waste->status_id == 4)
-                    $type .= '<span class="badge badge-primary text-white" data-toggle="tooltip" data-placement="top" title="'.Carbon::createFromFormat('Y-m-d H:i:s', $waste->updated_at)->format('d/m/Y H:i:s').'">'.$waste->status.'</span>';
+        return json_encode($waste);
 
-                return $type;
-            })
-            ->editColumn('quantity', function (Waste $waste) {
-                $quantity = $waste->quantity . " " . $waste->measured_unit;
-                return $quantity;
-            })
-            ->editColumn('pickup_date', function (Waste $waste) {
-                return Carbon::createFromFormat('Y-m-d', $waste->pickup_date)->format('d/m/Y');
-            })
-            ->editColumn('request_date', function (Waste $waste) {
-                return Carbon::createFromFormat('Y-m-d', $waste->request_date)->format('d/m/Y');
-            })
-            ->addColumn('action', function (Waste $waste) {
-                $url_show_transfer = "http://cafa.nelium.net/waste/user/show-transfer/".$waste->transfer_id;
-                $url_show_transfer_pdf = "http://cafa.nelium.net/waste/user/show-transfer/pdf/".$waste->transfer_id;
-
-                $links = '';
-
-                if($waste->status_id == 1){
-                    $links .= '<a class="btn btn-danger cancel-request m-1 text-white" data-transfer_id="'.$waste->transfer_id.'" data-toggle="tooltip" data-placement="top" title="Cancelar solicitud"><i class="fa fa-close" aria-hidden="true"></i></a>';
-                }
-
-                $links .= '<a target="_blank" href="'.$url_show_transfer.'" class="btn btn-info m-1" data-toggle="tooltip" data-placement="top" title="Ver solicitud"><i class="fa fa-eye" aria-hidden="true"></i></a>';
-                $links .= '<a href="'.$url_show_transfer_pdf.'" class="btn btn-purple m-1" data-toggle="tooltip" data-placement="top" title="Descargar solicitud"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>';
-
-                return $links;
-            })
-            ->rawColumns(['action', 'name', 'creator_name', 'status'])
-            ->toJson();
     }
 
     public function requestWaste(Request $request){
