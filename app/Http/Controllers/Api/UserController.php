@@ -174,4 +174,43 @@ class UserController extends Controller
         }
 
     }
+
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+        $customMessages = [
+            'confirm_password.same' => 'Las contraseñas introducidas no coinciden.',
+        ];
+        $validator = Validator::make($request->all(), [
+            'password' => 'required',
+            'confirm_password' => 'required|same:password',
+        ], $customMessages);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 422);
+        }
+
+        $input = $request->all();
+
+        $password = $input['password'];
+
+        DB::beginTransaction();
+        try{
+            $user->setPassword($password);
+            $user->save();
+
+            DB::commit();
+
+            return response()->json([
+                'update' => 'success',
+                'message' => 'Contraseña actualizada correctamente.'
+            ], 200);
+
+        }catch (\Exception $exception){
+            DB::rollBack();
+            Log::error($exception);
+            return response()->json(['exception' => $exception], 500);
+        }
+
+    }
 }

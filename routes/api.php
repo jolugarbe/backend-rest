@@ -35,6 +35,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('profile-data', 'Api\UserController@profileData');
         Route::post('show', 'Api\UserController@show');
         Route::post('update', 'Api\UserController@update');
+        Route::post('password/update', 'Api\UserController@updatePassword');
     });
 
     Route::prefix('waste')->group(function () {
