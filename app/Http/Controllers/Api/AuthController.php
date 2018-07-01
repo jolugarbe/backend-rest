@@ -72,7 +72,7 @@ class AuthController extends Controller
         $telephone = $input['telephone'];
         $email = $input['email'];
         $carbon_footprint = $input['carbon_footprint'];
-        $password = str_random(9);
+        $password = $input['password'];
         $carbon_inscription = array_key_exists('carbon_inscription', $input) ? $input['carbon_inscription'] : null;
         $notification_data = array_key_exists('notification_data', $input) ? true : null;
         $not_address_line = array_key_exists('not_address_line', $input) ? $input['not_address_line'] : null;
@@ -93,20 +93,6 @@ class AuthController extends Controller
             $token =  $user->createToken('MyApp')->accessToken;
 
             DB::commit();
-
-            $contenido = \View::make('emails.user-welcome',  compact('password', 'email'))->render();
-            $datos=[
-                $email,
-                $email,
-                'info@cafa.nelium.net',
-                'CAFA',
-                'CAFA | Datos de Acceso a la Bolsa de Residuos Reutilizables y Reciclables',
-                $contenido,
-                null,
-                null];
-
-            $mail=new EnviarMail($datos);
-            $this->dispatch($mail);
 
             return response()->json([
                 'token' => $token,
@@ -164,21 +150,7 @@ class AuthController extends Controller
                     ['email' => $email, 'token' => $token, 'created_at' => Carbon::now()]
                 );
 
-                $contenido = \View::make('emails.reset-password',  compact('token'))->render();
-                $datos=[
-                    $email,
-                    $email,
-                    'info@cafa.nelium.net',
-                    'CAFA',
-                    'Restaurar contraseña',
-                    $contenido,
-                    null,
-                    null];
-
-                $mail=new EnviarMail($datos);
-                $this->dispatch($mail);
-
-                return response()->json(['success' => 'Accede a tu email para poder restaurar la contraseña de acceso.'], 200);
+                return response()->json(['success' => 'Accede a tu email para poder restaurar la contraseña de acceso.', 'token' => $token], 200);
             }else{
                 return response()->json(['error' => 'El email introducido no está registrado.'], 404);
             }

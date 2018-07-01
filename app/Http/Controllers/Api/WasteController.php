@@ -329,40 +329,11 @@ class WasteController extends Controller
 
             DB::commit();
 
-            // Send to the owner of the waste
-            $is_owner = true;
-            $contenido = \View::make('emails.waste-transfer-request', compact('waste', 'is_owner'))->render();
-            $datos=[
-                $owner->getNotificationData->getEmail(),
-                $owner->getNotificationData->getEmail(),
-                'admin@bolsacafa.com',
-                'Admin',
-                'Solicitud de cesión de residuo recibida',
-                $contenido,
-                null,
-                null];
-
-            $mail=new EnviarMail($datos);
-            $this->dispatch($mail);
-
-//            // Send to the waste user request
-            $is_owner = false;
-            $contenido = \View::make('emails.waste-transfer-request', compact('waste', 'is_owner'))->render();
-            $datos=[
-                $user->getNotificationData->getEmail(),
-                $user->getNotificationData->getEmail(),
-                'admin@bolsacafa.com',
-                'Admin',
-                'Solicitud de cesión de residuo enviada',
-                $contenido,
-                null,
-                null];
-
-            $mail=new EnviarMail($datos);
-            $this->dispatch($mail);
-
             return response()->json([
-                'message' => "Solicitud tramitada correctamente."
+                'message' => "Solicitud tramitada correctamente.",
+                'waste' => json_encode($waste),
+                'owner_email' => $owner->getNotificationData->getEmail(),
+                'user_email' => $user->getNotificationData->getEmail(),
             ], 200);
 
         }catch (\Exception $exception){
@@ -475,23 +446,13 @@ class WasteController extends Controller
             $creator = $waste->getCreator;
             $proposal = $input['proposal'];
 
-            // Send to the waste user creator
-            $contenido = \View::make('emails.proposal-waste', compact('waste', 'user', 'creator', 'proposal'))->render();
-            $datos=[
-                $creator->getNotificationData->getEmail(),
-                $creator->getNotificationData->getEmail(),
-                $user->getNotificationData->getEmail(),
-                $user->getNotificationData->getEmail(),
-                'Propuesta sobre residuo demandado',
-                $contenido,
-                null,
-                null];
-
-            $mail=new EnviarMail($datos);
-            $this->dispatch($mail);
-
             return response()->json([
-                'message' => "Propuesta enviada correctamente."
+                'waste' => $waste,
+                'user' => $user,
+                'creator' => $creator,
+                'proposal' => $proposal,
+                'notification_creator' => $creator->getNotificationData,
+                'notification_user' => $user->getNotificationData
             ], 200);
 
         }catch (\Exception $exception){

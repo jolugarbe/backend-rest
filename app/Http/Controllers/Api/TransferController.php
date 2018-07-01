@@ -31,23 +31,10 @@ class TransferController extends Controller
             $waste = $transfer->getWaste;
             DB::commit();
 
-            // Send to the owner of the waste
-            $contenido = \View::make('emails.accept-transfer', compact('waste'))->render();
-            $datos=[
-                $waste->getOwner->getNotificationData->getEmail(),
-                $waste->getOwner->getNotificationData->getEmail(),
-                'info@cafa.nelium.net',
-                'CAFA',
-                'Solicitud aceptada',
-                $contenido,
-                null,
-                null];
-
-            $mail=new EnviarMail($datos);
-            $this->dispatch($mail);
-
             return response()->json([
-                'message' => "Solicitud aceptada correctamente."
+                'message' => "Solicitud aceptada correctamente.",
+                'waste' => $waste,
+                'owner_email' => $waste->getOwner->getNotificationData->getEmail()
             ], 200);
 
         }catch (\Exception $exception){
@@ -70,23 +57,10 @@ class TransferController extends Controller
             $waste = $transfer->getWaste;
             DB::commit();
 
-            // Send to the owner of the waste
-            $contenido = \View::make('emails.decline-transfer', compact('waste'))->render();
-            $datos=[
-                $waste->getOwner->getNotificationData->getEmail(),
-                $waste->getOwner->getNotificationData->getEmail(),
-                'info@cafa.nelium.net',
-                'CAFA',
-                'Solicitud rechazada',
-                $contenido,
-                null,
-                null];
-
-            $mail=new EnviarMail($datos);
-            $this->dispatch($mail);
-
             return response()->json([
-                'message' => "Solicitud rechazada correctamente."
+                'message' => "Solicitud rechazada correctamente.",
+                'waste' => $waste,
+                'owner_email' => $waste->getOwner->getNotificationData->getEmail()
             ], 200);
 
         }catch (\Exception $exception){
@@ -109,23 +83,10 @@ class TransferController extends Controller
             $waste = $transfer->getWaste;
             DB::commit();
 
-            // Send to the owner of the waste
-            $contenido = \View::make('emails.cancel-transfer', compact('waste'))->render();
-            $datos=[
-                $waste->getCreator->getNotificationData->getEmail(),
-                $waste->getCreator->getNotificationData->getEmail(),
-                'info@cafa.nelium.net',
-                'CAFA',
-                'Solicitud cancelada',
-                $contenido,
-                null,
-                null];
-
-            $mail=new EnviarMail($datos);
-            $this->dispatch($mail);
-
             return response()->json([
-                'message' => "Solicitud cancelada correctamente."
+                'message' => "Solicitud cancelada correctamente.",
+                'waste' => $waste,
+                'creator_email' => $waste->getCreator->getNotificationData->getEmail()
             ], 200);
 
         }catch (\Exception $exception){
