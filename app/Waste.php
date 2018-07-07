@@ -118,11 +118,11 @@ class Waste extends Model
     }
 
     public function getCerCode(){
-        return $this->cer_code;
+        return $this->belongsTo('App\CerCode', 'cer_code_id', 'id');
     }
 
-    public function setCerCode($value){
-        $this->cer_code = $value;
+    public function setCerCodeId($value){
+        $this->cer_code_id = $value;
     }
 
     public function getAvailable(){

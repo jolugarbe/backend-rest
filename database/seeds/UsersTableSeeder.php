@@ -99,7 +99,7 @@ class UsersTableSeeder extends Seeder
                     'address_id' => $address->id,
                     'transport' => str_random(15),
                     'dangerous' => random_int(0, 1),
-                    'cer_code' => random_int(1, 5),
+                    'cer_code_id' => random_int(1, 5),
                     't_frequency_id' => random_int(1, 4),
                     't_waste_id' => random_int(1, 15),
                     't_ad_id' => random_int(1, 2),

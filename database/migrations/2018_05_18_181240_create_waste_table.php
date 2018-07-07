@@ -29,7 +29,7 @@ class CreateWasteTable extends Migration
             $table->string('transport');
             $table->boolean('dangerous');
             $table->string('production')->nullable();
-            $table->integer('cer_code');
+            $table->integer('cer_code_id')->unsigned()->nullable();
             $table->integer('t_frequency_id')->unsigned()->nullable();
             $table->integer('t_waste_id')->unsigned()->nullable();
             $table->integer('t_ad_id')->unsigned()->nullable();
@@ -44,6 +44,7 @@ class CreateWasteTable extends Migration
             $table->index(['t_frequency_id']);
             $table->index(['t_waste_id']);
             $table->index(['t_ad_id']);
+            $table->index(['cer_code_id']);
             $table->index(['creator_user_id']);
             $table->index(['owner_user_id']);
 
@@ -51,6 +52,7 @@ class CreateWasteTable extends Migration
             $table->foreign('t_frequency_id')->references('id')->on('frequency_type')->onDelete('set null');
             $table->foreign('t_waste_id')->references('id')->on('waste_type')->onDelete('set null');
             $table->foreign('t_ad_id')->references('id')->on('ad_type')->onDelete('set null');
+            $table->foreign('cer_code_id')->references('id')->on('cer_codes')->onDelete('set null');
             $table->foreign('creator_user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('owner_user_id')->references('id')->on('users')->onDelete('set null');
 
