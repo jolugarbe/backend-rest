@@ -13,6 +13,7 @@ use App\Address;
 use App\Waste;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class WasteRepo extends BaseRepo
@@ -50,7 +51,7 @@ class WasteRepo extends BaseRepo
     $waste->setPickupDate(Carbon::createFromFormat('d/m/Y', $pickup_date)->format('Y-m-d'));
     $waste->setPackaging($packaging);
     $waste->setTransport($transport);
-    $waste->setCerCode($cer_code);
+    $waste->setCerCodeId($cer_code);
     $waste->setAdTypeId($ad_type);
     $waste->setAddressId($address->getId());
     $waste->setDescription($description);
@@ -84,7 +85,7 @@ class WasteRepo extends BaseRepo
         $waste->setPickupDate(Carbon::createFromFormat('d/m/Y', $pickup_date)->format('Y-m-d'));
         $waste->setPackaging($packaging);
         $waste->setTransport($transport);
-        $waste->setCerCode($cer_code);
+        $waste->setCerCodeId($cer_code);
         $waste->setAdTypeId($ad_type);
         $waste->setAddressId($address->getId());
         $waste->setDescription($description);
@@ -100,6 +101,7 @@ class WasteRepo extends BaseRepo
     {
         $query = $this->getModel()
             ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
+            ->join('cer_codes', 'cer_codes.id', '=', 'waste.cer_code_id')
             ->where('waste.creator_user_id', '=', $user->getId())
             ->whereNull('waste.owner_user_id');
 
@@ -111,7 +113,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('waste.t_waste_id', '=', $f_waste_type);
 
         if($f_cer_code)
-            $query = $query->where('waste.cer_code', 'like', '%'.$f_cer_code.'%');
+            $query = $query->where('waste.cer_code_id', '=', $f_cer_code);
 
         if($f_generation_date)
             $query = $query->where('waste.generation_date', '=', Carbon::createFromFormat('d/m/Y', $f_generation_date)->format('Y-m-d'));
@@ -123,7 +125,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('waste.t_ad_id', '=', $f_ad_type);
         // End Filters
 
-        $query = $query->select('waste.id', 'waste.quantity', 'waste.composition','waste.measured_unit', 'waste.name', 'waste.t_ad_id', 'waste.cer_code', 'waste.generation_date', 'waste.dangerous', 'waste_type.name as type', 'waste.acquired');
+        $query = $query->select('waste.id', 'waste.quantity', 'waste.composition','waste.measured_unit', 'waste.name', 'waste.t_ad_id', DB::raw("CONCAT(cer_codes.code,' - ',cer_codes.name) as cer_code"), 'waste.generation_date', 'waste.dangerous', 'waste_type.name as type', 'waste.acquired');
         return $query->get();
     }
 
@@ -131,6 +133,7 @@ class WasteRepo extends BaseRepo
     {
         $query = $this->getModel()
             ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
+            ->join('cer_codes', 'cer_codes.id', '=', 'waste.cer_code_id')
             ->join('users', 'users.id', '=', 'waste.creator_user_id')
             ->where('creator_user_id', '!=', $user->getId())
             ->whereNull('owner_user_id')
@@ -144,7 +147,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('waste.t_waste_id', '=', $f_waste_type);
 
         if($f_cer_code)
-            $query = $query->where('waste.cer_code', 'like', '%'.$f_cer_code.'%');
+            $query = $query->where('waste.cer_code_id', '=', $f_cer_code);
 
         if($f_pickup_date)
             $query = $query->where('waste.pickup_date', '=', Carbon::createFromFormat('d/m/Y', $f_pickup_date)->format('Y-m-d'));
@@ -159,7 +162,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('waste.dangerous', '=', $f_dangerous);
         // End Filters
 
-        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as creator_name', 'waste.generation_date as generation_date', 'waste_type.name as type', 'waste.dangerous', 'waste.creator_user_id');
+        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', DB::raw("CONCAT(cer_codes.code,' - ',cer_codes.name) as cer_code"), 'waste.pickup_date', 'users.business_name as creator_name', 'waste.generation_date as generation_date', 'waste_type.name as type', 'waste.dangerous', 'waste.creator_user_id');
 
         return $query->get();
     }
@@ -168,6 +171,7 @@ class WasteRepo extends BaseRepo
     {
         $query = $this->getModel()
             ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
+            ->join('cer_codes', 'cer_codes.id', '=', 'waste.cer_code_id')
             ->join('users', 'users.id', '=', 'waste.creator_user_id')
             ->where('creator_user_id', '!=', $user->getId())
             ->whereNull('owner_user_id')
@@ -181,7 +185,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('waste.t_waste_id', '=', $f_waste_type);
 
         if($f_cer_code)
-            $query = $query->where('waste.cer_code', 'like', '%'.$f_cer_code.'%');
+            $query = $query->where('waste.cer_code_id', '=', $f_cer_code);
 
         if($f_pickup_date)
             $query = $query->where('waste.pickup_date', '=', Carbon::createFromFormat('d/m/Y', $f_pickup_date)->format('Y-m-d'));
@@ -202,7 +206,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('waste.created_at', '<=', Carbon::createFromFormat('d/m/Y', $f_publication_date_2)->format('Y-m-d H:i:s'));
         // End Filters
 
-        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as creator_name', 'waste.generation_date as generation_date', 'waste_type.name as type', 'waste.dangerous', 'waste.created_at as publication_date', 'waste.creator_user_id');
+        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', DB::raw("CONCAT(cer_codes.code,' - ',cer_codes.name) as cer_code"), 'waste.pickup_date', 'users.business_name as creator_name', 'waste.generation_date as generation_date', 'waste_type.name as type', 'waste.dangerous', 'waste.created_at as publication_date', 'waste.creator_user_id');
 
         return $query->get();
     }
@@ -211,6 +215,7 @@ class WasteRepo extends BaseRepo
     {
         $query = $this->getModel()
             ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
+            ->join('cer_codes', 'cer_codes.id', '=', 'waste.cer_code_id')
             ->join('transfers', 'transfers.waste_id', '=', 'waste.id')
             ->join('status_transfers', 'status_transfers.id', '=', 'transfers.status_id')
             ->join('users', 'users.id', '=', 'transfers.applicant_user_id')
@@ -224,7 +229,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('waste.t_waste_id', '=', $f_waste_type);
 
         if($f_cer_code)
-            $query = $query->where('waste.cer_code', 'like', '%'.$f_cer_code.'%');
+            $query = $query->where('waste.cer_code_id', '=', $f_cer_code);
 
         if($f_pickup_date)
             $query = $query->where('waste.pickup_date', '=', Carbon::createFromFormat('d/m/Y', $f_pickup_date)->format('Y-m-d'));
@@ -236,7 +241,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('transfers.transfer_date', '=', Carbon::createFromFormat('d/m/Y', $f_request_date)->format('Y-m-d'));
         // End Filters
 
-        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as request_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id', 'status_transfers.display_name as status', 'transfers.status_id', 'waste.owner_user_id', 'transfers.updated_at');
+        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', DB::raw("CONCAT(cer_codes.code,' - ',cer_codes.name) as cer_code"), 'waste.pickup_date', 'users.business_name as request_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id', 'status_transfers.display_name as status', 'transfers.status_id', 'waste.owner_user_id', 'transfers.updated_at');
 
         return $query->get();
     }
@@ -245,6 +250,7 @@ class WasteRepo extends BaseRepo
     {
         $query = $this->getModel()
             ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
+            ->join('cer_codes', 'cer_codes.id', '=', 'waste.cer_code_id')
             ->join('transfers', 'transfers.waste_id', '=', 'waste.id')
             ->join('status_transfers', 'status_transfers.id', '=', 'transfers.status_id')
             ->join('users', 'users.id', '=', 'transfers.owner_user_id')
@@ -258,7 +264,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('waste.t_waste_id', '=', $f_waste_type);
 
         if($f_cer_code)
-            $query = $query->where('waste.cer_code', 'like', '%'.$f_cer_code.'%');
+            $query = $query->where('waste.cer_code_id', '=', $f_cer_code);
 
         if($f_pickup_date)
             $query = $query->where('waste.pickup_date', '=', Carbon::createFromFormat('d/m/Y', $f_pickup_date)->format('Y-m-d'));
@@ -270,7 +276,7 @@ class WasteRepo extends BaseRepo
             $query = $query->where('transfers.transfer_date', '=', Carbon::createFromFormat('d/m/Y', $f_request_date)->format('Y-m-d'));
         // End Filters
 
-        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', 'waste.cer_code', 'waste.pickup_date', 'users.business_name as creator_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id', 'status_transfers.display_name as status', 'transfers.status_id', 'waste.creator_user_id', 'transfers.updated_at');
+        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', DB::raw("CONCAT(cer_codes.code,' - ',cer_codes.name) as cer_code"), 'waste.pickup_date', 'users.business_name as creator_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id', 'status_transfers.display_name as status', 'transfers.status_id', 'waste.creator_user_id', 'transfers.updated_at');
 
         return $query->get();
     }

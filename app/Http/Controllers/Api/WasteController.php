@@ -7,6 +7,9 @@ use App\Locality;
 use App\Province;
 use App\Repositories\AddressRepo;
 use App\Repositories\AdTypeRepo;
+use App\Repositories\CerCodeRepo;
+use App\Repositories\CerGroupRepo;
+use App\Repositories\CerSubgroupRepo;
 use App\Repositories\FrequencyRepo;
 use App\Repositories\LocalityRepo;
 use App\Repositories\ProvinceRepo;
@@ -33,8 +36,11 @@ class WasteController extends Controller
     protected $wasteRepo;
     protected $addressRepo;
     protected $transferRepo;
+    protected $cerGroupRepo;
+    protected $cerSubgroupRepo;
+    protected $cerCodeRepo;
 
-    function __construct(AdTypeRepo $adTypeRepo, FrequencyRepo $frequencyRepo, WasteTypeRepo $wasteTypeRepo, LocalityRepo $localityRepo, ProvinceRepo $provinceRepo, WasteRepo $wasteRepo, AddressRepo $addressRepo, TransferRepo $transferRepo)
+    function __construct(AdTypeRepo $adTypeRepo, FrequencyRepo $frequencyRepo, WasteTypeRepo $wasteTypeRepo, LocalityRepo $localityRepo, ProvinceRepo $provinceRepo, WasteRepo $wasteRepo, AddressRepo $addressRepo, TransferRepo $transferRepo, CerGroupRepo $cerGroupRepo, CerSubgroupRepo $cerSubgroupRepo, CerCodeRepo $cerCodeRepo)
     {
         $this->adRepo = $adTypeRepo;
         $this->frequencyRepo = $frequencyRepo;
@@ -44,6 +50,9 @@ class WasteController extends Controller
         $this->wasteRepo = $wasteRepo;
         $this->addressRepo = $addressRepo;
         $this->transferRepo = $transferRepo;
+        $this->cerGroupRepo = $cerGroupRepo;
+        $this->cerSubgroupRepo = $cerSubgroupRepo;
+        $this->cerCodeRepo = $cerCodeRepo;
     }
 
     public function allCreateData(){
@@ -54,7 +63,10 @@ class WasteController extends Controller
             $types = $this->wasteTypeRepo->allOrderByName('asc');
             $localities = $this->localityRepo->allOrderByName('asc');
             $provinces = $this->provinceRepo->allOrderByName('asc');
-            return response()->json(['ads' => $adType, 'frequencies' => $frequencies, 'types' => $types, 'localities' => $localities, 'provinces' => $provinces], 200);
+            $cerGroups = $this->cerGroupRepo->all();
+            $cerSubgroups = $this->cerSubgroupRepo->all();
+            $cerCodes = $this->cerCodeRepo->all();
+            return response()->json(['ads' => $adType, 'frequencies' => $frequencies, 'types' => $types, 'localities' => $localities, 'provinces' => $provinces, 'cer_groups' => $cerGroups, 'cer_subgroups' => $cerSubgroups, 'cer_codes' => $cerCodes], 200);
         }catch (\Exception $exception){
             return response()->json(['exception' => $exception->getMessage()], 500);
         }
@@ -74,10 +86,12 @@ class WasteController extends Controller
             $provinces = $this->provinceRepo->allOrderByName('asc');
             $address = $this->addressRepo->findOrFail($waste['address_id']);
             $locality = $this->localityRepo->findOrFail($address['locality_id']);
+            $cer_subgroups = $this->cerSubgroupRepo->all();
+            $cer_codes = $this->cerCodeRepo->all();
 
             if($waste['creator_user_id'] == $user->getId() && $waste['owner_user_id'] == null)
             {
-                return response()->json(['ads' => $adType, 'frequencies' => $frequencies, 'types' => $types, 'localities' => $localities, 'provinces' => $provinces, 'waste' => $waste, 'address' => $address, 'locality' => $locality], 200);
+                return response()->json(['ads' => $adType, 'frequencies' => $frequencies, 'types' => $types, 'localities' => $localities, 'provinces' => $provinces, 'waste' => $waste, 'address' => $address, 'locality' => $locality, 'cer_subgroups' => $cer_subgroups, 'cer_codes' => $cer_codes], 200);
             }else {
                 return response()->json(['exception' => 'No tienes permiso para editar este residuo.'], 403);
             }
@@ -357,8 +371,9 @@ class WasteController extends Controller
             $address = $this->addressRepo->findOrFail($waste['address_id']);
             $locality = $address->getLocality->getName();
             $province = $address->getLocality->getProvince->getName();
+            $cer_code = $waste->getCerCode;
 
-            return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province], 200);
+            return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province, 'cer_code' => $cer_code], 200);
 //            if($waste['owner_user_id'] == $user->getId())
 //            {
 //                return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province], 200);
@@ -401,6 +416,7 @@ class WasteController extends Controller
             $input = $request->all();
             $transfer = $this->transferRepo->findOrFail($input['transfer_id']);
             $waste = $transfer->getWaste;
+            $cer_code = $waste->getCerCode;
             $adType = $waste->getAdType->getName();
             $frequency = $waste->getFrequency->getName();
             $type = $waste->getWasteType->getName();
@@ -427,7 +443,7 @@ class WasteController extends Controller
 
             if($transfer['owner_user_id'] == $user->getId() || $transfer['applicant_user_id'] == $user->getId())
             {
-                return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province, 'owner_user' => $owner_user, 'owner_activity' => $owner_activity, 'owner_address' => $owner_address, 'owner_locality' => $owner_locality, 'owner_province' => $owner_province, 'request_user' => $request_user, 'request_activity' => $request_activity, 'request_address' => $request_address, 'request_locality' => $request_locality, 'request_province' => $request_province, 'status_transfer_id' => $status_transfer_id, 'status_transfer_name' => $status_transfer_name], 200);
+                return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province, 'owner_user' => $owner_user, 'owner_activity' => $owner_activity, 'owner_address' => $owner_address, 'owner_locality' => $owner_locality, 'owner_province' => $owner_province, 'request_user' => $request_user, 'request_activity' => $request_activity, 'request_address' => $request_address, 'request_locality' => $request_locality, 'request_province' => $request_province, 'status_transfer_id' => $status_transfer_id, 'status_transfer_name' => $status_transfer_name, 'cer_code' => $cer_code], 200);
             }else {
                 return response()->json(['exception' => 'No tienes permiso para ver esta operación.'], 403);
             }

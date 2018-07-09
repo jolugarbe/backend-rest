@@ -29,6 +29,7 @@ class TransferController extends Controller
             $transfer->save();
 
             $waste = $transfer->getWaste;
+            Log::info('WASTE FOR ACCEPT'. json_encode($waste));
             DB::commit();
 
             return response()->json([
