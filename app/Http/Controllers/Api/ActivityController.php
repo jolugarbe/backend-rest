@@ -10,7 +10,7 @@ class ActivityController extends Controller
 {
     public function all()
     {
-        $activities = Activity::all();
+        $activities = Activity::orderBy('group')->get();
         return response()->json(compact('activities'), 200);
     }
 }

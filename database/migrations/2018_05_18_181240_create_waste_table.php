@@ -36,7 +36,7 @@ class CreateWasteTable extends Migration
             $table->integer('creator_user_id')->unsigned()->nullable();
             $table->integer('owner_user_id')->unsigned()->nullable()->default(null);
             $table->boolean('available')->default(1);
-            $table->boolean('acquired')->nullable();
+            $table->boolean('acquired')->nullable()->default(0);
             $table->timestamps();
 
             $table->index(['id']);
@@ -53,8 +53,8 @@ class CreateWasteTable extends Migration
             $table->foreign('t_waste_id')->references('id')->on('waste_type')->onDelete('set null');
             $table->foreign('t_ad_id')->references('id')->on('ad_type')->onDelete('set null');
             $table->foreign('cer_code_id')->references('id')->on('cer_codes')->onDelete('set null');
-            $table->foreign('creator_user_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('owner_user_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('creator_user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('owner_user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->softDeletes();
         });

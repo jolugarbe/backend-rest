@@ -14,6 +14,7 @@ use App\NotificationData;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserRepo extends BaseRepo
 {
@@ -127,5 +128,43 @@ class UserRepo extends BaseRepo
         }
 
         return $user;
+    }
+
+    public function usersListData($user, $f_business_name, $f_activity, $f_cif, $f_register_from, $f_register_until, $f_carbon_footprint, $f_carbon_from, $f_carbon_until)
+    {
+        $query = $this->getModel()
+            ->leftJoin('addresses', 'addresses.id', '=', 'users.address_id')
+            ->join('activities', 'activities.id', '=', 'users.activity_id')
+            ->where('users.id', '<>', $user->getId());
+
+        // Filters
+        if($f_business_name)
+            $query = $query->where('users.business_name', 'like', '%'.$f_business_name.'%');
+
+        if($f_activity)
+            $query = $query->where('users.activity_id', '=', $f_activity);
+
+        if($f_cif)
+            $query = $query->where('users.cif', 'like', '%'.$f_cif.'%');
+
+        if($f_register_from)
+            $query = $query->where('users.created_at', '>=', Carbon::createFromFormat('d/m/Y', $f_register_from)->subDay()->format('Y-m-d H:i:s'));
+
+        if($f_register_until)
+            $query = $query->where('users.created_at', '<=', Carbon::createFromFormat('d/m/Y', $f_register_until)->format('Y-m-d H:i:s'));
+
+        if($f_carbon_footprint != 'all')
+            $query = $query->where('users.carbon_footprint', '=', $f_carbon_footprint);
+
+        if($f_carbon_from)
+            $query = $query->where('users.carbon_inscription', '>=', Carbon::createFromFormat('d/m/Y', $f_carbon_from)->format('Y-m-d'));
+
+        if($f_carbon_until)
+            $query = $query->where('users.carbon_inscription', '<=', Carbon::createFromFormat('d/m/Y', $f_carbon_until)->format('Y-m-d'));
+        // End Filters
+
+        $query = $query->select('users.id', 'users.business_name', DB::raw("CONCAT('GRUPO ',activities.group,' - ',activities.name) as activity"), 'users.cif', 'users.created_at as register_date', 'users.carbon_footprint', 'users.carbon_inscription');
+
+        return $query->get();
     }
 }

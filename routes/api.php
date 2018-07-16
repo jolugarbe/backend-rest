@@ -20,6 +20,7 @@ Route::get('activities/all', 'Api\ActivityController@all');
 Route::get('provinces/all', 'Api\ProvinceController@all');
 Route::get('localities/all', 'Api\LocalityController@all');
 Route::get('waste/create-data', 'Api\WasteController@allCreateData');
+Route::get('users/create-data', 'Api\AdminController@allUserCreateData');
 
 Route::post('register', 'Api\AuthController@register');
 Route::post('login', 'Api\AuthController@login');
@@ -66,5 +67,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     // ADMIN
     Route::prefix('admin')->group(function () {
         Route::post('dashboard-data', 'Api\AdminController@dashboardData');
+        Route::post('users/list-data', 'Api\AdminController@usersListData');
+        Route::post('users/user-data', 'Api\AdminController@userData');
+        Route::post('users/update', 'Api\AdminController@updateUser');
+        Route::post('users/delete', 'Api\AdminController@deleteUser');
+
     });
 });

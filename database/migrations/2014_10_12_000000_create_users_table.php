@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->integer('telephone');
             $table->string('email')->unique();
             $table->string('password');
-            $table->boolean('carbon_footprint')->nullable();
+            $table->boolean('carbon_footprint')->nullable()->default(0);
             $table->date('carbon_inscription')->nullable();
             $table->rememberToken();
             $table->timestamps();

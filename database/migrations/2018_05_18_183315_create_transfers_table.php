@@ -28,9 +28,9 @@ class CreateTransfersTable extends Migration
             $table->index(['waste_id']);
             $table->index(['status_id']);
 
-            $table->foreign('owner_user_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('applicant_user_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('waste_id')->references('id')->on('waste')->onDelete('set null');
+            $table->foreign('owner_user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('applicant_user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('waste_id')->references('id')->on('waste')->onDelete('cascade');
             $table->foreign('status_id')->references('id')->on('status_transfers')->onDelete('set null');
 
             $table->softDeletes();
