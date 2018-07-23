@@ -26,41 +26,54 @@ class UsersTableSeeder extends Seeder
             'display_name' => 'User'
         ]);
 
+        $address_user = Address::firstOrCreate([
+            'address_line' => str_random('25'),
+            'postal_code' => random_int(5,5),
+            'locality_id' => random_int(1, 8116)
+        ]);
+
         $admin = User::firstOrCreate([
             'name' => 'Admin',
-            'email' => 'admin@admin.local',
+            'email' => 'admin@cafa.nelium.net',
             'password' => bcrypt('admin'),
-            'business_name' => 'Administrator',
-            'telephone' => 123456789
+            'business_name' => 'Administrador',
+            'telephone' => 123456789,
+            'address_id' => $address_user->id,
+            'activity_id' => 19
         ]);
 
         $admin->assignRole('admin');
 
-        $user = User::firstOrCreate([
-            'name' => 'User 1',
-            'email' => 'user@front.local',
-            'password' => bcrypt('1'),
-            'business_name' => 'Test user',
-            'telephone' => 123456789
+        $address_not = Address::firstOrCreate([
+            'address_line' => str_random('25'),
+            'postal_code' => random_int(00000,99999),
+            'locality_id' => random_int(1, 8116)
         ]);
 
-        $user->assignRole('user');
+        $notification_data = NotificationData::firstOrCreate([
+            'address_id' => $address_not->id,
+            'contact_person' => $admin->name,
+            'email' => $admin->email,
+            'telephone' => $admin->telephone,
+            'user_id' => $admin->id
+        ]);
 
         for ($i = 1; $i <= 50; $i++)
         {
             $address_user = Address::firstOrCreate([
                 'address_line' => str_random('25'),
-                'postal_code' => random_int(5,5),
+                'postal_code' => random_int(00000,99999),
                 'locality_id' => random_int(1, 8116)
             ]);
 
             $user = User::firstOrCreate([
                 'name' => 'User '.$i,
-                'email' => 'user'.$i.'@front.local',
+                'email' => 'user'.$i.'@cafa.nelium.net',
                 'password' => bcrypt('1'),
                 'business_name' => 'Test user '.$i,
                 'telephone' => 123456789,
-                'address_id' => $address_user->id
+                'address_id' => $address_user->id,
+                'activity_id' => random_int(1,5)
             ]);
 
             $user->assignRole('user');
@@ -79,11 +92,11 @@ class UsersTableSeeder extends Seeder
                 'user_id' => $user->id
             ]);
 
-            for($j = 1; $j <= random_int(1, 7); $j++)
+            for($j = 1; $j <= random_int(1, 10); $j++)
             {
                 $address = Address::firstOrCreate([
                     'address_line' => str_random('25'),
-                    'postal_code' => random_int(5,5),
+                    'postal_code' => random_int(00000,99999),
                     'locality_id' => random_int(1, 8116)
                 ]);
 
@@ -93,13 +106,13 @@ class UsersTableSeeder extends Seeder
                     'measured_unit' => array_rand(array('Kg', 'Tn', 'L', 'C3'), 1),
                     'composition' => str_random('10'),
                     'generation_date' => \Carbon\Carbon::create(2014, 5, 28, 0, 0, 0)->addWeeks(rand(1, 52))->format('Y-m-d'),
-                    'pickup_date' => \Carbon\Carbon::create(2014, 5, 28, 0, 0, 0)->addWeeks(rand(52, 90))->format('Y-m-d'),
+                    'pickup_date' => \Carbon\Carbon::create(2015, 5, 28, 0, 0, 0)->addWeeks(rand(52, 90))->format('Y-m-d'),
                     'packaging' => str_random('35'),
                     'handling' => str_random('150'),
                     'address_id' => $address->id,
                     'transport' => str_random(15),
                     'dangerous' => random_int(0, 1),
-                    'cer_code_id' => random_int(1, 5),
+                    'cer_code_id' => random_int(1, 25),
                     't_frequency_id' => random_int(1, 4),
                     't_waste_id' => random_int(1, 15),
                     't_ad_id' => random_int(1, 2),

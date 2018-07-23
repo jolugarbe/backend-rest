@@ -96,4 +96,34 @@ class TransferController extends Controller
             return response()->json(['exception' => $exception, 'message' => "Se ha producido un error al tramitar la cancelación de la solicitud."], 500);
         }
     }
+
+    public function deleteTransfer(Request $request){
+        $input = $request->all();
+        DB::beginTransaction();
+        try{
+            $user = Auth::user();
+            $transfer = $this->transferRepo->findOrFail($input['transfer_id']);
+            $waste = $transfer->getWaste;
+            $creator_email = $waste->getCreator->getNotificationData->getEmail();
+            $request_email = $waste->getOwner->getNotificationData->getEmail();
+
+            $waste_data = $transfer->getWaste;
+
+            $transfer->delete();
+            $waste->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => "Solicitud eliminada correctamente.",
+                'waste' => $waste_data,
+                'creator_email' => $creator_email,
+                'request_email' => $request_email
+            ], 200);
+
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return response()->json(['exception' => $exception, 'message' => "Se ha producido un error al intentar eliminar la solicitud."], 500);
+        }
+    }
 }

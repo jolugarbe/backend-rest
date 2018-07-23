@@ -10,6 +10,7 @@ use App\Repositories\ProvinceRepo;
 use App\Repositories\TransferRepo;
 use App\Repositories\UserRepo;
 use App\Repositories\WasteRepo;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -46,9 +47,41 @@ class AdminController extends Controller
             $total_users = $this->userRepo->all()->count();
             $total_transfers = $this->transferRepo->all()->count();
             $total_demand = $this->wasteRepo->getModel()->where('t_ad_id', '=', 2)->count();
-            $total_offers = $this->wasteRepo->getModel()->where('t_ad_id', '=', 1)->count();
+            $total_offers = $this->wasteRepo->getModel()->where('t_ad_id', '=', 1)->where('available', '=', 1)->count();
+            $users_by_month = array();
 
-            return response()->json(['user' => $user, 'total_users' => $total_users, 'total_transfers' => $total_transfers, 'total_demand' => $total_demand, 'total_offers' => $total_offers], 200);
+            for($i = 1; $i <= 12; $i++)
+            {
+                $users = $this->userRepo->getUsersByMonthYear($i, Carbon::now()->year);
+                array_push($users_by_month, $users);
+            }
+
+            $transfers_months = array();
+
+            for($i = 1; $i <= 12; $i++)
+            {
+                $transfers = $this->transferRepo->getTransfersByMonthYear($i, Carbon::now()->year);
+                array_push($transfers_months, $transfers);
+            }
+
+            $waste_available_months = array();
+
+            for($i = 1; $i <= 12; $i++)
+            {
+                $waste = $this->wasteRepo->getWasteByMonthYear($i, Carbon::now()->year, 1);
+                array_push($waste_available_months, $waste);
+            }
+
+            $waste_request_months = array();
+
+            for($i = 1; $i <= 12; $i++)
+            {
+                $waste = $this->wasteRepo->getWasteByMonthYear($i, Carbon::now()->year, 2);
+                array_push($waste_request_months, $waste);
+            }
+
+
+            return response()->json(['user' => $user, 'total_users' => $total_users, 'total_transfers' => $total_transfers, 'total_demand' => $total_demand, 'total_offers' => $total_offers, 'users_months' => $users_by_month, 'transfers_months' => $transfers_months, 'waste_available_months' => $waste_available_months, 'waste_request_months' => $waste_request_months], 200);
         }catch (\Exception $exception){
             return response()->json(['exception' => $exception->getMessage()], 500);
         }
@@ -209,5 +242,78 @@ class AdminController extends Controller
             DB::rollBack();
             return response()->json(['exception' => $exception, 'message' => "Se ha producido un error al eliminar el usuario."], 500);
         }
+    }
+
+    public function allTransfersData(Request $request){
+        $user = Auth::user();
+        $f_name = $request->input('f_name');
+        $f_waste_type = $request->input('f_waste_type');
+        $f_cer_code = $request->input('f_cer_code');
+        $f_create_date_start = $request->input('f_create_date_start');
+        $f_create_date_end = $request->input('f_create_date_end');
+        $f_request_name = $request->input('f_request_name');
+        $f_creator_name = $request->input('f_creator_name');
+        $waste = $this->wasteRepo->allTransfersData($user, $f_name, $f_waste_type, $f_cer_code, $f_create_date_start, $f_create_date_end, $f_request_name, $f_creator_name);
+
+        return json_encode($waste);
+
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $customMessages = [
+            'email.unique' => 'El :attribute ya está registrado.',
+            'cif.unique' => 'El :attribute ya está registrado.'
+        ];
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'address_line' => 'required',
+            'postal_code' => 'required',
+            'province' => 'required',
+            'locality' => 'required',
+            'telephone' => 'required',
+            'email' => [
+                'required',
+                Rule::unique('users')->ignore($user->getId()),
+                'email'
+            ],
+//            'password' => 'required',
+//            'confirm_password' => 'required|same:password',
+        ], $customMessages);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 422);
+        }
+
+        $input = $request->all();
+
+        $name = $input['name'];
+        $address_line = $input['address_line'];
+        $postal_code = $input['postal_code'];
+        $province = $input['province'];
+        $locality = $input['locality'];
+        $telephone = $input['telephone'];
+        $email = $input['email'];
+
+        DB::beginTransaction();
+        try{
+            $user = $this->userRepo->updateAdminUser($user, $name, $address_line, $postal_code, $province, $locality, $telephone, $email);
+
+            DB::commit();
+
+            return response()->json([
+                'update' => 'success',
+                'message' => 'Datos actualizados correctamente.'
+            ], 200);
+
+        }catch (\Exception $exception){
+            DB::rollBack();
+            Log::error($exception);
+            return response()->json(['exception' => $exception], 500);
+        }
+
     }
 }

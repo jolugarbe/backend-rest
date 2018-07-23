@@ -31,4 +31,13 @@ class TransferRepo extends BaseRepo
         $transfer = $this->updateWithoutData($transfer);
         return $transfer;
     }
+
+    public function getTransfersByMonthYear($month, $year){
+        $query = $this->getModel()
+            ->whereYear('created_at', '=', $year)
+            ->whereMonth('created_at', '=', $month)
+            ->count('id');
+
+        return $query;
+    }
 }

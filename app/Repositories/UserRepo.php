@@ -167,4 +167,33 @@ class UserRepo extends BaseRepo
 
         return $query->get();
     }
+
+    public function getUsersByMonthYear($month, $year){
+        $query = $this->getModel()
+            ->whereYear('created_at', '=', $year)
+            ->whereMonth('created_at', '=', $month)
+            ->count('id');
+
+        return $query;
+    }
+
+    public function updateAdminUser($user, $name, $address_line, $postal_code, $province, $locality, $telephone, $email){
+
+        // Address for user
+        $address = $user->getAddress;
+        $address->setAddressLine($address_line);
+        $address->setPostalCode($postal_code);
+        $address->setLocalityId($locality);
+        $address = $this->updateWithoutData($address);
+
+        // User
+        $user->setAddressId($address->getId());
+        $user->setName($name);
+        $user->setTelephone($telephone);
+        $user->setEmail($email);
+
+        $user = $this->updateWithoutData($user);
+
+        return $user;
+    }
 }

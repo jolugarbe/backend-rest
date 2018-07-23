@@ -281,4 +281,53 @@ class WasteRepo extends BaseRepo
         return $query->get();
     }
 
+    public function allTransfersData($user, $f_name = null, $f_waste_type = null, $f_cer_code = null, $f_create_date_start = null, $f_create_date_end = null, $f_request_name = null, $f_creator_name = null)
+    {
+        $query = $this->getModel()
+            ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
+            ->join('cer_codes', 'cer_codes.id', '=', 'waste.cer_code_id')
+            ->join('transfers', 'transfers.waste_id', '=', 'waste.id')
+            ->join('status_transfers', 'status_transfers.id', '=', 'transfers.status_id')
+            ->join('users as request_user', 'request_user.id', '=', 'transfers.applicant_user_id')
+            ->join('users as creator_user', 'creator_user.id', '=', 'transfers.owner_user_id');
+
+        // Filters
+        if($f_name)
+            $query = $query->where('waste.name', 'like', '%'.$f_name.'%');
+
+        if($f_waste_type)
+            $query = $query->where('waste.t_waste_id', '=', $f_waste_type);
+
+        if($f_cer_code)
+            $query = $query->where('waste.cer_code_id', '=', $f_cer_code);
+
+        if($f_create_date_start)
+            $query = $query->where('transfers.created_at', '>=', Carbon::createFromFormat('d/m/Y', $f_create_date_start)->subDay()->format('Y-m-d H:i:s'));
+
+        if($f_create_date_end)
+            $query = $query->where('transfers.created_at', '<=', Carbon::createFromFormat('d/m/Y', $f_create_date_end)->format('Y-m-d H:i:s'));
+
+        if($f_request_name)
+            $query = $query->where('request_user.business_name', 'like', '%'.$f_request_name.'%');
+
+        if($f_creator_name)
+            $query = $query->where('creator_user.business_name', 'like', '%'.$f_creator_name.'%');
+
+        // End Filters
+
+        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', DB::raw("CONCAT(cer_codes.code,' - ',cer_codes.name) as cer_code"), 'creator_user.business_name as creator_name', 'request_user.business_name as request_name', 'transfers.transfer_date as request_date', 'waste_type.name as type', 'transfers.id as transfer_id', 'status_transfers.display_name as status', 'transfers.status_id', 'transfers.owner_user_id as creator_user_id', 'transfers.applicant_user_id as request_user_id', 'transfers.updated_at');
+
+        return $query->get();
+    }
+
+    public function getWasteByMonthYear($month, $year, $type){
+        $query = $this->getModel()
+            ->where('t_ad_id', '=', $type)
+            ->whereYear('created_at', '=', $year)
+            ->whereMonth('created_at', '=', $month)
+            ->count('id');
+
+        return $query;
+    }
+
 }

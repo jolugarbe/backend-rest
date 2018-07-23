@@ -89,7 +89,7 @@ class WasteController extends Controller
             $cer_subgroups = $this->cerSubgroupRepo->all();
             $cer_codes = $this->cerCodeRepo->all();
 
-            if($waste['creator_user_id'] == $user->getId() && $waste['owner_user_id'] == null)
+            if(($waste['creator_user_id'] == $user->getId() && $waste['owner_user_id'] == null) || $user->hasRole('admin'))
             {
                 return response()->json(['ads' => $adType, 'frequencies' => $frequencies, 'types' => $types, 'localities' => $localities, 'provinces' => $provinces, 'waste' => $waste, 'address' => $address, 'locality' => $locality, 'cer_subgroups' => $cer_subgroups, 'cer_codes' => $cer_codes], 200);
             }else {
@@ -393,7 +393,7 @@ class WasteController extends Controller
             $user = Auth::user();
             $waste = $this->wasteRepo->findOrFail($input['waste_id']);
 
-            if($waste->getCreator->getId() == $user->getId())
+            if($waste->getCreator->getId() == $user->getId() || $user->hasRole('admin'))
             {
                 $waste->delete();
             }else{
@@ -441,7 +441,7 @@ class WasteController extends Controller
             $status_transfer_id = $transfer->getStatus->getId();
             $status_transfer_name = $transfer->getStatus->getDisplayName();
 
-            if($transfer['owner_user_id'] == $user->getId() || $transfer['applicant_user_id'] == $user->getId())
+            if($transfer['owner_user_id'] == $user->getId() || $transfer['applicant_user_id'] == $user->getId() || $user->hasRole('admin'))
             {
                 return response()->json(['ads' => $adType, 'frequency' => $frequency, 'type' => $type,  'waste' => $waste, 'address' => $address, 'locality' => $locality, 'province' => $province, 'owner_user' => $owner_user, 'owner_activity' => $owner_activity, 'owner_address' => $owner_address, 'owner_locality' => $owner_locality, 'owner_province' => $owner_province, 'request_user' => $request_user, 'request_activity' => $request_activity, 'request_address' => $request_address, 'request_locality' => $request_locality, 'request_province' => $request_province, 'status_transfer_id' => $status_transfer_id, 'status_transfer_name' => $status_transfer_name, 'cer_code' => $cer_code], 200);
             }else {

@@ -49,10 +49,10 @@ class CreateWasteTable extends Migration
             $table->index(['owner_user_id']);
 
             $table->foreign('address_id')->references('id')->on('addresses')->onDelete('set null');
-            $table->foreign('t_frequency_id')->references('id')->on('frequency_type')->onDelete('set null');
-            $table->foreign('t_waste_id')->references('id')->on('waste_type')->onDelete('set null');
-            $table->foreign('t_ad_id')->references('id')->on('ad_type')->onDelete('set null');
-            $table->foreign('cer_code_id')->references('id')->on('cer_codes')->onDelete('set null');
+            $table->foreign('t_frequency_id')->references('id')->on('frequency_type')->onDelete('cascade');
+            $table->foreign('t_waste_id')->references('id')->on('waste_type')->onDelete('cascade');
+            $table->foreign('t_ad_id')->references('id')->on('ad_type')->onDelete('cascade');
+            $table->foreign('cer_code_id')->references('id')->on('cer_codes')->onDelete('cascade');
             $table->foreign('creator_user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('owner_user_id')->references('id')->on('users')->onDelete('cascade');
 

@@ -71,6 +71,8 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('users/user-data', 'Api\AdminController@userData');
         Route::post('users/update', 'Api\AdminController@updateUser');
         Route::post('users/delete', 'Api\AdminController@deleteUser');
-
+        Route::post('waste/transfers-data', 'Api\AdminController@allTransfersData');
+        Route::post('transfer/delete', 'Api\TransferController@deleteTransfer');
+        Route::post('profile/update', 'Api\AdminController@updateProfile');
     });
 });
