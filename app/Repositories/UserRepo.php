@@ -83,7 +83,7 @@ class UserRepo extends BaseRepo
         return $user;
     }
 
-    public function updateUser($user, $name, $activity, $business_name, $cif, $address_line, $postal_code, $province, $locality, $contact_person, $telephone, $email, $not_address_line, $not_contact_person, $not_email, $not_locality, $not_postal_code, $not_province, $not_telephone, $carbon_footprint, $carbon_inscription, $notification_data){
+    public function updateUser($user, $name, $activity, $business_name, $cif, $address_line, $postal_code, $province, $locality, $contact_person, $telephone, $email, $not_address_line, $not_contact_person, $not_email, $not_locality, $not_postal_code, $not_province, $not_telephone, $carbon_footprint, $carbon_inscription, $notification_data, $created_at = null){
 
         // Address for user
         $address = $user->getAddress;
@@ -102,6 +102,9 @@ class UserRepo extends BaseRepo
         $user->setTelephone($telephone);
         $user->setEmail($email);
         $user->setCarbonFootprint($carbon_footprint);
+
+        if($created_at)
+            $user->created_at = Carbon::createFromFormat('d/m/Y', $created_at);
 
         if($carbon_footprint == 1)
             $user->setCarbonInscription(Carbon::createFromFormat('d/m/Y', $carbon_inscription));

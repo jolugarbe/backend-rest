@@ -225,10 +225,11 @@ class WasteController extends Controller
         $description = array_key_exists('description', $input) ? $input['description'] : null;
         $presentation = array_key_exists('presentation', $input) ? $input['presentation'] : null;
         $production = array_key_exists('production', $input) ? $input['production'] : null;
+        $created_at = array_key_exists('created_at', $input) ? $input['created_at'] : null;
 
         DB::beginTransaction();
         try{
-            $waste = $this->wasteRepo->updateWaste($name, $waste_type, $quantity, $measured_unit, $frequency, $composition, $dangerous, $handling, $generation_date, $pickup_date, $packaging, $transport, $cer_code, $ad_type, $address_line, $postal_code, $province, $locality, $description, $presentation, $production, $creator_id, $waste_id, $address_id);
+            $waste = $this->wasteRepo->updateWaste($name, $waste_type, $quantity, $measured_unit, $frequency, $composition, $dangerous, $handling, $generation_date, $pickup_date, $packaging, $transport, $cer_code, $ad_type, $address_line, $postal_code, $province, $locality, $description, $presentation, $production, $creator_id, $waste_id, $address_id, $created_at);
 
             DB::commit();
 

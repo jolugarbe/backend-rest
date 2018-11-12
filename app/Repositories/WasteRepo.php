@@ -64,7 +64,7 @@ class WasteRepo extends BaseRepo
     return $waste;
 }
 
-    public function updateWaste($name, $waste_type, $quantity, $measured_unit, $frequency, $composition, $dangerous, $handling, $generation_date, $pickup_date, $packaging, $transport, $cer_code, $ad_type, $address_line, $postal_code, $province, $locality, $description, $presentation, $production, $creator_id, $waste_id, $address_id)
+    public function updateWaste($name, $waste_type, $quantity, $measured_unit, $frequency, $composition, $dangerous, $handling, $generation_date, $pickup_date, $packaging, $transport, $cer_code, $ad_type, $address_line, $postal_code, $province, $locality, $description, $presentation, $production, $creator_id, $waste_id, $address_id, $created_at = null)
     {
         $address = $this->addressRepo->findOrFail($address_id);
         $address->setAddressLine($address_line);
@@ -91,6 +91,8 @@ class WasteRepo extends BaseRepo
         $waste->setDescription($description);
         $waste->setPresentation($presentation);
         $waste->setProduction($production);
+        if($created_at)
+            $waste->created_at = Carbon::createFromFormat('d/m/Y', $created_at);
 
         $waste = $this->updateWithoutData($waste);
 

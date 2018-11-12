@@ -167,6 +167,7 @@ class AdminController extends Controller
             'locality' => 'required',
             'contact_person' => 'required',
             'telephone' => 'required',
+            'created_at' => 'required',
             'carbon_footprint' => 'required',
             'carbon_inscription' => 'required_if:carbon_footprint,1',
             'email' => [
@@ -195,6 +196,7 @@ class AdminController extends Controller
         $contact_person = $input['contact_person'];
         $telephone = $input['telephone'];
         $email = $input['email'];
+        $created_at = $input['created_at'];
         $carbon_footprint = $input['carbon_footprint'];
         $carbon_inscription = array_key_exists('carbon_inscription', $input) ? $input['carbon_inscription'] : null;
         $notification_data = array_key_exists('notification_data', $input) ? true : null;
@@ -208,7 +210,7 @@ class AdminController extends Controller
 
         DB::beginTransaction();
         try{
-            $user = $this->userRepo->updateUser($user, $name, $activity, $business_name, $cif, $address_line, $postal_code, $province, $locality, $contact_person, $telephone, $email, $not_address_line, $not_contact_person, $not_email, $not_locality, $not_postal_code, $not_province, $not_telephone, $carbon_footprint, $carbon_inscription, $notification_data);
+            $user = $this->userRepo->updateUser($user, $name, $activity, $business_name, $cif, $address_line, $postal_code, $province, $locality, $contact_person, $telephone, $email, $not_address_line, $not_contact_person, $not_email, $not_locality, $not_postal_code, $not_province, $not_telephone, $carbon_footprint, $carbon_inscription, $notification_data, $created_at);
 
             DB::commit();
 
