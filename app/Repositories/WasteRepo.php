@@ -131,7 +131,7 @@ class WasteRepo extends BaseRepo
         return $query->get();
     }
 
-    public function availableData($user, $f_name = null, $f_waste_type = null, $f_cer_code = null, $f_pickup_date = null, $f_creator_name = null, $f_generation_date = null, $f_dangerous = null)
+    public function availableData($user, $f_name = null, $f_waste_type = null, $f_cer_code = null, $f_pickup_date = null, $f_creator_name = null, $f_generation_date = null, $f_dangerous = null, $f_publication_date_1 = null, $f_publication_date_2 = null)
     {
         $query = $this->getModel()
             ->join('waste_type', 'waste_type.id', '=', 'waste.t_waste_id')
@@ -160,11 +160,17 @@ class WasteRepo extends BaseRepo
         if($f_generation_date)
             $query = $query->where('waste.generation_date', '=', Carbon::createFromFormat('d/m/Y', $f_generation_date)->format('Y-m-d'));
 
+        if($f_publication_date_1)
+            $query = $query->where('waste.created_at', '>=', Carbon::createFromFormat('d/m/Y', $f_publication_date_1)->subDay()->format('Y-m-d H:i:s'));
+
+        if($f_publication_date_2)
+            $query = $query->where('waste.created_at', '<=', Carbon::createFromFormat('d/m/Y', $f_publication_date_2)->format('Y-m-d H:i:s'));
+
         if($f_dangerous != 'all')
             $query = $query->where('waste.dangerous', '=', $f_dangerous);
         // End Filters
 
-        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', DB::raw("CONCAT(cer_codes.code,' - ',cer_codes.name) as cer_code"), 'waste.pickup_date', 'users.business_name as creator_name', 'waste.generation_date as generation_date', 'waste_type.name as type', 'waste.dangerous', 'waste.creator_user_id');
+        $query = $query->select('waste.id', 'waste.quantity','waste.measured_unit', 'waste.name', DB::raw("CONCAT(cer_codes.code,' - ',cer_codes.name) as cer_code"), 'waste.pickup_date', 'users.business_name as creator_name', 'waste.generation_date as generation_date', 'waste_type.name as type', 'waste.dangerous', 'waste.creator_user_id', 'waste.created_at as publication_date');
 
         return $query->get();
     }

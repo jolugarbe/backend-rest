@@ -281,7 +281,9 @@ class WasteController extends Controller
         $f_creator_name = $request->input('f_creator_name');
         $f_generation_date = $request->input('f_generation_date');
         $f_dangerous = $request->input('f_dangerous');
-        $waste = $this->wasteRepo->availableData($user, $f_name, $f_waste_type, $f_cer_code, $f_pickup_date, $f_creator_name, $f_generation_date, $f_dangerous);
+        $f_publication_date_1 = $request->input('f_publication_date_1');
+        $f_publication_date_2 = $request->input('f_publication_date_2');
+        $waste = $this->wasteRepo->availableData($user, $f_name, $f_waste_type, $f_cer_code, $f_pickup_date, $f_creator_name, $f_generation_date, $f_dangerous, $f_publication_date_1, $f_publication_date_2);
 
         return json_encode($waste);
     }
